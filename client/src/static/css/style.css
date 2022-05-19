@@ -1,0 +1,20 @@
+:root {
+    --grid-size: 3;
+}
+
+/* -- GAME DASHBOARD --  */
+
+.game-dashboard {
+    width: 50vw;
+    height: 50vh;
+    margin-inline: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-dashboard form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
