@@ -13,7 +13,7 @@ const Game = () => {
 
     useEffect(() => {
         setGame(new GameModel())
-        setPlayers([new PlayerModel(1235, true)])
+        setPlayers([new PlayerModel(1235, true), new PlayerModel(1236, false)])
     }, [])
 
     useEffect(() => {

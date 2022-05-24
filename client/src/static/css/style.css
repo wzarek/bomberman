@@ -29,6 +29,7 @@
     display: grid;
     grid-template-columns: repeat(var(--grid-width), 1fr);
     grid-template-rows: repeat(var(--grid-height), 1fr);
+    outline: 5px solid black;
 }
 
 #game-container .game-block {
@@ -38,7 +39,15 @@
 }
 
 #game-container .game-block.colliding {
-    background-color: red;
+    border-color: red;
+}
+
+#game-container .game-block.wall {
+    background-color: black;
+}
+
+#game-container .game-block.bonus {
+    background-color: gold;
 }
 
 .player {
@@ -46,6 +55,6 @@
     width: 1.75vw;
     height: 1.75vw;
     border-radius: 100%;
-    background-color: black;
+    background-color: blue;
     transition: top .05s, left .05s;
 }
