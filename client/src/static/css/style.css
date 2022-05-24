@@ -1,12 +1,11 @@
 :root {
-    --grid-size: 3;
+
 }
 
 /* -- GAME DASHBOARD --  */
 
 .game-dashboard {
     width: 50vw;
-    height: 50vh;
     margin-inline: auto;
     display: flex;
     justify-content: center;
@@ -17,4 +16,36 @@
     display: flex;
     flex-direction: column;
     gap: 1em;
+}
+
+/* GAME CONTAINER */
+
+#game-container {
+    position: relative;
+    margin-inline: auto;
+    width: 60vw;
+    align-items: center;
+    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(var(--grid-width), 1fr);
+    grid-template-rows: repeat(var(--grid-height), 1fr);
+}
+
+#game-container .game-block {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border: 1px solid rgba(0, 0, 0, 0.26);
+}
+
+#game-container .game-block.colliding {
+    background-color: red;
+}
+
+.player {
+    position: absolute;
+    width: 1.75vw;
+    height: 1.75vw;
+    border-radius: 100%;
+    background-color: black;
+    transition: top .05s, left .05s;
 }
