@@ -1,12 +1,20 @@
+import BombModel from "./BombModel"
+
 class PlayerModel {
     private id: number
     private currentPlayer: boolean
     private playerElement: HTMLElement
     private collisionGap: number = 0.25
+    private playerSpeed: number
+    private bombCooldown: number = 3
+    private bombTimeout: any = null
+    private lives: number
 
-    constructor(id_: number, currentPlayer_: boolean) {
+    constructor(id_: number, currentPlayer_: boolean, playerSpeed_: number = 1, lives_: number = 3) {
         this.id = id_
         this.currentPlayer = currentPlayer_
+        this.playerSpeed = playerSpeed_
+        this.lives = lives_
 
         let player = document.createElement('div')
         player.classList.add('player')
@@ -14,6 +22,7 @@ class PlayerModel {
 
         if (currentPlayer_) {
             document.addEventListener('keydown', (evt) => this.handleKeyDown(evt as KeyboardEvent))
+            document.addEventListener('keypress', (evt) => this.handleKeyPress(evt as KeyboardEvent))
         }
     }
 
@@ -43,12 +52,13 @@ class PlayerModel {
     }
 
     private isColliding(direction: string) {
-        const gameCollidors = document.querySelectorAll('.game-block.wall, .game-block.bonus')
+        const gameColliders = document.querySelectorAll('.game-block.wall, .game-block.bonus, .flames')
         let colliding = false
-        gameCollidors.forEach((collidor) => {
-            if (this.isCollidingWithElement(this.playerElement, collidor as HTMLElement, direction)) {
-                colliding = true
-                console.log(collidor)
+        gameColliders.forEach((collider) => {
+            if (this.isCollidingWithElement(this.playerElement, collider as HTMLElement, direction)) {
+                if (collider.classList.contains('flames')) {
+                    this.removeLife()
+                } else colliding = true
             }
         })
         return colliding
@@ -73,42 +83,120 @@ class PlayerModel {
     private startMoving(direction: string) {
         switch (direction) {
             case 'left':
-                if (this.canMove('left')) this.playerElement.style.left = `calc(${this.playerElement.style.left} - 0.2vw)`
-                break;
+                if (this.canMove('left')) this.playerElement.style.left = `calc(${this.playerElement.style.left} - ${this.playerSpeed * 0.25}vw)`
+                break
             case 'right':
-                if (this.canMove('right')) this.playerElement.style.left = `calc(${this.playerElement.style.left} + 0.2vw)`
-                break;
+                if (this.canMove('right')) this.playerElement.style.left = `calc(${this.playerElement.style.left} + ${this.playerSpeed * 0.25}vw)`
+                break
             case 'up':
-                if (this.canMove('up')) this.playerElement.style.top = `calc(${this.playerElement.style.top} - 0.2vw)`
-                break;
+                if (this.canMove('up')) this.playerElement.style.top = `calc(${this.playerElement.style.top} - ${this.playerSpeed * 0.25}vw)`
+                break
             case 'down':
-                if (this.canMove('down')) this.playerElement.style.top = `calc(${this.playerElement.style.top} + 0.2vw)`
-                break;
+                if (this.canMove('down')) this.playerElement.style.top = `calc(${this.playerElement.style.top} + ${this.playerSpeed * 0.25}vw)`
+                break
         }
 
         this.updatePosition()
     }
 
+    private isOnBlock(pl: HTMLElement, el: HTMLElement) {
+        let elVal = el.getBoundingClientRect()
+        let playerVal = pl.getBoundingClientRect()
+        return ((playerVal.bottom <= elVal.top) ||
+            (playerVal.top >= elVal.bottom) ||
+            (playerVal.right <= elVal.left) ||
+            (playerVal.left >= elVal.right))
+    }
+
+    private whereToBomb() {
+        const gameColliders = document.querySelectorAll('.game-block.empty.colliding') as NodeListOf<HTMLElement>
+        let el = null
+        gameColliders.forEach((collider) => {
+            this.isOnBlock(this.playerElement, collider as HTMLElement) && (el = collider)
+        })
+        return el
+    }
+
+    private putBomb(el: HTMLElement) {
+        let bomb = new BombModel(el)
+    }
+
+    private tryBomb() {
+        if (!this.bombTimeout) {
+            let block = this.whereToBomb()
+            if (block) {
+                this.putBomb(block as HTMLElement)
+            }
+            this.bombTimeout = setTimeout(() => this.bombTimeout = null, this.bombCooldown * 1000)
+        }
+    }
+
     private handleKeyDown(evt: KeyboardEvent) {
-        evt = evt || window.event;
+        evt = evt || window.event
         switch (evt.key) {
             case 'ArrowLeft':
+                evt.preventDefault()
                 this.startMoving('left')
-                break;
+                break
             case 'ArrowRight':
+                evt.preventDefault()
                 this.startMoving('right')
-                break;
+                break
             case 'ArrowUp':
+                evt.preventDefault()
                 this.startMoving('up')
-                break;
+                break
             case 'ArrowDown':
+                evt.preventDefault()
                 this.startMoving('down')
-                break;
+                break
         }
+    }
+
+    private handleKeyPress(evt: KeyboardEvent) {
+        evt.stopImmediatePropagation();
+        evt = evt || window.event
+        switch (evt.key) {
+            case ' ':
+                evt.preventDefault()
+                this.tryBomb()
+                break
+        }
+    }
+
+    private removeLife() {
+        const animKeframes = [
+            { opacity: 0.5 },
+            { opacity: 0.75 },
+            { opacity: 0.5 },
+            { opacity: 0.75 },
+            { opacity: 0.5 },
+            { opacity: 1 }
+        ]
+        const animTiming = {
+            duration: 1000,
+            iterations: 1,
+        }
+        this.playerElement.animate(animKeframes, animTiming)
+        if (this.lives > 0) {
+            this.lives -= 1
+        } else this.handleDead()
+    }
+
+    private handleDead() {
+        alert(`Player ${this.id} lost!`)
     }
 
     public getPlayer() {
         return this.playerElement
+    }
+
+    public setBombCooldown(cd: number) {
+        this.bombCooldown = cd
+    }
+
+    public getPlayerLives() {
+        return this.lives
     }
 }
 

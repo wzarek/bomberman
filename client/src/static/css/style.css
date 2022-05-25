@@ -23,9 +23,9 @@
 #game-container {
     position: relative;
     margin-inline: auto;
-    width: 60vw;
+    max-width: fit-content;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     display: grid;
     grid-template-columns: repeat(var(--grid-width), 1fr);
     grid-template-rows: repeat(var(--grid-height), 1fr);
@@ -33,9 +33,13 @@
 }
 
 #game-container .game-block {
-    width: 100%;
+    width: 2.5em;
     aspect-ratio: 1/1;
     border: 1px solid rgba(0, 0, 0, 0.26);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
 #game-container .game-block.colliding {
@@ -57,4 +61,15 @@
     border-radius: 100%;
     background-color: blue;
     transition: top .05s, left .05s;
+}
+
+.bomb {
+    width: 1vw;
+    height: 1vw;
+    background-color: red;
+}
+
+.flames {
+    position: absolute;
+    background-color: darkred;
 }
