@@ -73,3 +73,16 @@
     position: absolute;
     background-color: darkred;
 }
+
+.bonus-for-player {
+    width: 1vw;
+    height: 1vw;
+}
+
+.bonus-for-player.bonus-speed {
+    background-color: limegreen;
+}
+
+.bonus-for-player.bonus-cd {
+    background-color: royalblue;
+}

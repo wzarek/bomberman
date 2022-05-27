@@ -4,11 +4,19 @@ class GameModel {
     private width: number
     private height: number
     private gameContainer: HTMLElement
+    private gameStarted: boolean = false;
     private players: Array<PlayerModel> = []
     private tempMatrix: Array<Array<string>>
     private gameMatrix: Array<Array<HTMLElement>>
     private bombCooldown: number // sec
 
+    /**
+     * Generates a Game model
+     * @optional @param width_  and
+     * @param height_ are game dimensions (not working properly yet)
+     * @param cooldown_ is a time value in seconds, bomb use cooldown for users
+     * @param gameContainer_ is a selector for game main container
+     */
     constructor(width_: number = 30, height_: number = 15, cooldown_: number = 3, gameContainer_: string = "#game-container") {
         this.width = width_
         this.height = height_
@@ -89,10 +97,56 @@ class GameModel {
                 block?.classList?.toggle('colliding', this.areColliding(pl, block))
             })
         })
+
+        const flames = document.querySelectorAll('.flames')
+        flames.forEach((flame) => {
+            this.areColliding(pl, flame as HTMLElement) && this.players[0].removeLife();
+        })
+
+        const bonuses = document.querySelectorAll('.bonus-for-player')
+        bonuses.forEach((bonus) => {
+            if (this.areColliding(pl, bonus as HTMLElement)) {
+                if (bonus.classList.contains('bonus-speed')) {
+                    this.players[0].increaseSpeed()
+                    bonus.remove()
+                }
+                else if (bonus.classList.contains('bonus-cd')) {
+                    this.players[0].decreaseBombCooldown()
+                    bonus.remove()
+                }
+            }
+        })
     }
 
     private startListeningToPlayerMoves() {
         setInterval(() => this.getPlayerPosition(), 100)
+    }
+
+    private generateBonus() {
+        let num = Math.random();
+
+        if (num < 0.4) return 'empty';  //probability 0.4
+        else if (num < 0.7) return 'speed'; // probability 0.3
+        else return 'cooldown-reduction'; //probability 0.3
+    }
+
+    public handleBonus(el: HTMLElement) {
+        el.classList.remove('bonus')
+        let bonusType = this.generateBonus()
+        if (bonusType === 'empty') return;
+
+        let bonusElement = document.createElement('div')
+        bonusElement.classList.add('bonus-for-player')
+
+        switch (bonusType) {
+            case 'speed':
+                bonusElement.classList.add('bonus-speed')
+                break;
+            case 'cooldown-reduction':
+                bonusElement.classList.add('bonus-cd')
+                break;
+        }
+        el.appendChild(bonusElement)
     }
 
     public initializeGame() {
@@ -100,12 +154,12 @@ class GameModel {
         this.setBlocks()
         this.spawnPlayers()
         this.startListeningToPlayerMoves();
-        console.log(this.tempMatrix)
+
+        this.gameStarted = true;
     }
 
-
-
     public addPlayer(player: PlayerModel) {
+        if (this.gameStarted) return;
         this.players.push(player)
     }
 }

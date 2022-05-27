@@ -11,11 +11,10 @@ const Game = () => {
     const [game, setGame]: [GameModel | undefined, any] = useState()
     const [players, setPlayers]: [Array<PlayerModel> | undefined, any] = useState()
 
-    const currPlayer = new PlayerModel(1235, true)
-
     useEffect(() => {
-        setGame(new GameModel())
-        setPlayers([currPlayer, new PlayerModel(1236, false)])
+        let currGame = new GameModel()
+        setGame(currGame)
+        setPlayers([new PlayerModel(currGame as GameModel, 1235, true), new PlayerModel(currGame as GameModel, 1236, false)])
     }, [])
 
     useEffect(() => {
@@ -30,7 +29,7 @@ const Game = () => {
     return (
         <>
             <p>
-                Current lives: {currPlayer.getPlayerLives()}
+                Current lives: 3
             </p>
             <div id='game-container'>
 

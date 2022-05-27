@@ -1,19 +1,24 @@
 import BombModel from "./BombModel"
+import GameModel from "./GameModel"
 
 class PlayerModel {
     private id: number
+    private gameModel: GameModel;
     private currentPlayer: boolean
     private playerElement: HTMLElement
     private collisionGap: number = 0.25
     private playerSpeed: number
-    private bombCooldown: number = 3
+    private bombCooldown: number
     private bombTimeout: any = null
     private lives: number
+    private damageTimer: any = null
 
-    constructor(id_: number, currentPlayer_: boolean, playerSpeed_: number = 1, lives_: number = 3) {
+    constructor(gameModel_: GameModel, id_: number, currentPlayer_: boolean, playerSpeed_: number = 1, lives_: number = 3) {
+        this.gameModel = gameModel_
         this.id = id_
         this.currentPlayer = currentPlayer_
         this.playerSpeed = playerSpeed_
+        this.bombCooldown = 3
         this.lives = lives_
 
         let player = document.createElement('div')
@@ -22,7 +27,6 @@ class PlayerModel {
 
         if (currentPlayer_) {
             document.addEventListener('keydown', (evt) => this.handleKeyDown(evt as KeyboardEvent))
-            document.addEventListener('keypress', (evt) => this.handleKeyPress(evt as KeyboardEvent))
         }
     }
 
@@ -52,13 +56,11 @@ class PlayerModel {
     }
 
     private isColliding(direction: string) {
-        const gameColliders = document.querySelectorAll('.game-block.wall, .game-block.bonus, .flames')
+        const gameColliders = document.querySelectorAll('.game-block.wall, .game-block.bonus')
         let colliding = false
         gameColliders.forEach((collider) => {
             if (this.isCollidingWithElement(this.playerElement, collider as HTMLElement, direction)) {
-                if (collider.classList.contains('flames')) {
-                    this.removeLife()
-                } else colliding = true
+                colliding = true
             }
         })
         return colliding
@@ -118,16 +120,16 @@ class PlayerModel {
     }
 
     private putBomb(el: HTMLElement) {
-        let bomb = new BombModel(el)
+        let bomb = new BombModel(this.gameModel, el)
     }
 
     private tryBomb() {
         if (!this.bombTimeout) {
+            this.bombTimeout = setTimeout(() => { this.bombTimeout = null }, this.bombCooldown * 1000)
             let block = this.whereToBomb()
             if (block) {
                 this.putBomb(block as HTMLElement)
             }
-            this.bombTimeout = setTimeout(() => this.bombTimeout = null, this.bombCooldown * 1000)
         }
     }
 
@@ -150,13 +152,6 @@ class PlayerModel {
                 evt.preventDefault()
                 this.startMoving('down')
                 break
-        }
-    }
-
-    private handleKeyPress(evt: KeyboardEvent) {
-        evt.stopImmediatePropagation();
-        evt = evt || window.event
-        switch (evt.key) {
             case ' ':
                 evt.preventDefault()
                 this.tryBomb()
@@ -164,23 +159,25 @@ class PlayerModel {
         }
     }
 
-    private removeLife() {
-        const animKeframes = [
-            { opacity: 0.5 },
-            { opacity: 0.75 },
-            { opacity: 0.5 },
-            { opacity: 0.75 },
-            { opacity: 0.5 },
-            { opacity: 1 }
-        ]
-        const animTiming = {
-            duration: 1000,
-            iterations: 1,
-        }
-        this.playerElement.animate(animKeframes, animTiming)
-        if (this.lives > 0) {
+    public removeLife() {
+        if (this.damageTimer == null) {
+            const animKeframes = [
+                { opacity: 0.5 },
+                { opacity: 0.75 },
+                { opacity: 0.5 },
+                { opacity: 0.75 },
+                { opacity: 0.5 },
+                { opacity: 1 }
+            ]
+            const animTiming = {
+                duration: 1000,
+                iterations: 1,
+            }
+            this.playerElement.animate(animKeframes, animTiming)
             this.lives -= 1
-        } else this.handleDead()
+            this.damageTimer = setTimeout(() => this.damageTimer = null, 1000)
+            if (this.lives <= 0) this.handleDead()
+        }
     }
 
     private handleDead() {
@@ -193,6 +190,17 @@ class PlayerModel {
 
     public setBombCooldown(cd: number) {
         this.bombCooldown = cd
+    }
+
+    public increaseSpeed() {
+        if (this.playerSpeed >= 2.5) return
+        this.playerSpeed += 0.5
+    }
+
+    public decreaseBombCooldown() {
+        if (this.bombCooldown <= 0.5) return
+        this.setBombCooldown(this.bombCooldown + 0.5)
+        console.log(this.bombCooldown)
     }
 
     public getPlayerLives() {
