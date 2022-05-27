@@ -1,4 +1,10 @@
-# Bomberman game project - [TS]
+# Bomberman game project
+![last-commit](https://img.shields.io/github/last-commit/wzarek/bomberman)
+![made-with-react](https://img.shields.io/badge/made%20with-React-61dafb.svg)
+![made-with-nodejs](https://img.shields.io/badge/made%20with-Node.js-339933.svg)
+![made-with-socketio](https://img.shields.io/badge/made%20with-Socket.io-000000.svg)
+![made-with-typescript](https://img.shields.io/badge/made%20with-Typescript-3178C6.svg)
+
 
 ## How to run this project
 
