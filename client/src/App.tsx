@@ -3,9 +3,11 @@ import Dashboard from './components/Dashboard'
 import UsernameForm from './components/UsernameForm'
 import Room from './components/Room'
 import { Routes, Route } from 'react-router-dom'
-import './static/css/style.css'
 import { AuthContext, AuthProvider } from './components/AuthProvider'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import './static/css/style.css'
+import Game from './components/Game'
+
 
 function App() {
   const { loading } = useContext(AuthContext)
