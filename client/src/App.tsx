@@ -1,15 +1,24 @@
-import React from 'react'
+import { useContext } from 'react'
 import Dashboard from './components/Dashboard'
-import { io } from 'socket.io-client'
+import UsernameForm from './components/UsernameForm'
+import Room from './components/Room'
+import { Routes, Route } from 'react-router-dom'
 import './static/css/style.css'
-
-const socket = io('http://localhost:3000')
+import { AuthContext, AuthProvider } from './components/AuthProvider'
+import { ProtectedRoute } from './components/ProtectedRoute'
 
 function App() {
+  const { loading } = useContext(AuthContext)
+
   return (
-    <div className="App">
-      <Dashboard socket={socket} />
-    </div>
+      <Routes>
+            <Route path='/' element={ <UsernameForm /> } />
+            <Route element={ <ProtectedRoute /> }>
+              <Route path='/dashboard' element={ <Dashboard /> } />
+            </Route>
+            <Route path='/room/:name' element={ <Room />}/>
+            <Route path='*' />
+      </Routes>
   )
 }
 
