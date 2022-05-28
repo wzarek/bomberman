@@ -19,12 +19,14 @@ const ioServer = (httpServer: any, corsConfig: object) => {
     io.on("connection", (socket) => {
         let currentRoom: string;
         socket.data.ready = false
-
-        // TODO - generowanie macierzy dla mapy i wyslanie po polaczeniu
+        socket.data.lastPosition = null
+        socket.data.reconnectTime = null
 
         // Utworzone zmienne socketowe (socket.data):
         // ready - gotowosc do gry (czy wczytal komponent Game)
         // position - [1, 2, 3, 4] - pozycja gracza (w ktorym rogu ma sie pojawic)
+        // lastPosition - ostatnia pozycja gracza
+        // reconnectTime - [null, settimeout] - timeout na usuniecie gracza jesli opuscil gre
 
         socket.on('connect', () => {
             console.log(`Socket: ${socket.id}}`)
@@ -47,21 +49,30 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         })
 
         socket.on('join-room', (room) => {
+
+
             let roomSize = io.sockets.adapter.rooms.get(room)?.size || 0
+
             if (roomSize >= 4) {
+                // TODO - zrobienie to bardziej pod ilosc graczy z lobby, zeby nikt potem nie dolaczyl, a nie na max ilosc, to ustawic w lobby
                 socket.emit('max-players-reached')
             } else {
                 let playersInRoom = io.sockets.adapter.rooms.get(room) as Set<string>
                 let playersArray = Array.from(playersInRoom?.values() || []).map((player) => {
-                    let playerSocket = io.sockets.sockets.get(player)
-                    return [player, playerSocket?.data?.position]
+                    if (player != socket.id) {
+                        let playerSocket = io.sockets.sockets.get(player)
+                        return [player, playerSocket?.data?.position]
+                    }
                 })
                 socket.emit('players-in-room', playersArray)
+
                 socket.data.position = playersInRoom?.size + 1 || 1
                 socket.emit('player-position', socket.data.position)
+
                 socket.join(room)
                 currentRoom = room
                 console.log(`${socket.id} joined room ${room}`)
+
                 if (matrixMap.has(room)) {
                     let gameModel = matrixMap.get(room) as ServerGameModel
                     socket.emit('game-matrix', gameModel.getMatrix())
@@ -103,6 +114,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
 
         socket.on('player-moved', (position: object) => {
             socket.to(currentRoom).emit('move-player', socket.id, position)
+            socket.data.lastPosition = position
         })
 
         socket.on('player-bombed', () => {
