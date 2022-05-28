@@ -4,18 +4,26 @@ class GameModel {
     private width: number
     private height: number
     private gameContainer: HTMLElement
+    private gameStarted: boolean = false;
     private players: Array<PlayerModel> = []
     private tempMatrix: Array<Array<string>>
     private gameMatrix: Array<Array<HTMLElement>>
     private bombCooldown: number // sec
 
+    /**
+     * Generates a Game model
+     * @optional @param width_  and
+     * @param height_ are game dimensions (not working properly yet)
+     * @param cooldown_ is a time value in seconds, bomb use cooldown for users
+     * @param gameContainer_ is a selector for game main container
+     */
     constructor(width_: number = 30, height_: number = 15, cooldown_: number = 3, gameContainer_: string = "#game-container") {
         this.width = width_
         this.height = height_
         this.bombCooldown = cooldown_
         this.gameContainer = document.querySelector(gameContainer_) as HTMLElement
-        this.tempMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill('empty'));
-        this.gameMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill(0));
+        this.tempMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill('empty'))
+        this.gameMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill(0))
     }
 
     private areColliding(el1: HTMLElement, el2: HTMLElement) {
@@ -29,10 +37,10 @@ class GameModel {
     }
 
     private getRandomBlock() {
-        let num = Math.random();
-        if (num < 0.75) return 'empty';  //probability 0.75
-        else if (num < 0.95) return 'wall'; // probability 0.2
-        else return 'bonus'; //probability 0.05
+        let num = Math.random()
+        if (num < 0.75) return 'empty' //probability 0.75
+        else if (num < 0.95) return 'wall' // probability 0.2
+        else return 'bonus' //probability 0.05
     }
 
     private generateMatrix() {
@@ -58,36 +66,61 @@ class GameModel {
     }
 
     private spawnPlayers() {
-        this.players.forEach((player, i) => {
+        let playerSize = '1.75em'
+        this.players.forEach((player) => {
             let currentPlayer = player.getPlayer()
             this.gameContainer.append(currentPlayer)
-            switch (i) {
-                case 0:
-                    currentPlayer.style.top = '.15vw' // top left
-                    currentPlayer.style.left = '.15vw'
-                    break
+            switch (player.getPlayerPosition()) {
                 case 1:
-                    currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom right
-                    currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.top = '.5em' // top left
+                    currentPlayer.style.left = '.5em'
+                    currentPlayer.style.backgroundColor = 'blue'
                     break
                 case 2:
-                    currentPlayer.style.top = '.15vw' // top right
-                    currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom right
+                    currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
+                    currentPlayer.style.backgroundColor = 'brown'
                     break
                 case 3:
-                    currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom left
-                    currentPlayer.style.left = '.15vw'
+                    currentPlayer.style.top = '.5em' // top right
+                    currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
+                    currentPlayer.style.backgroundColor = 'green'
+                    break
+                case 4:
+                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom left
+                    currentPlayer.style.left = '.5em'
+                    currentPlayer.style.backgroundColor = 'pink'
                     break
             }
         })
     }
 
     private getPlayerPosition() {
-        let pl = this.players[0].getPlayer()
+        let player = this.getCurrentPlayer() as PlayerModel
+        let pl = player.getPlayer()
         this.gameMatrix.forEach((arr) => {
             arr.forEach((block) => {
                 block?.classList?.toggle('colliding', this.areColliding(pl, block))
             })
+        })
+
+        const flames = document.querySelectorAll('.flames')
+        flames.forEach((flame) => {
+            this.areColliding(pl, flame as HTMLElement) && player.removeLife();
+        })
+
+        const bonuses = document.querySelectorAll('.bonus-for-player')
+        bonuses.forEach((bonus) => {
+            if (this.areColliding(pl, bonus as HTMLElement)) {
+                if (bonus.classList.contains('bonus-speed')) {
+                    player.increaseSpeed()
+                    bonus.remove()
+                }
+                else if (bonus.classList.contains('bonus-cd')) {
+                    player.decreaseBombCooldown()
+                    bonus.remove()
+                }
+            }
         })
     }
 
@@ -95,18 +128,62 @@ class GameModel {
         setInterval(() => this.getPlayerPosition(), 100)
     }
 
-    public initializeGame() {
-        this.generateMatrix()
-        this.setBlocks()
-        this.spawnPlayers()
-        this.startListeningToPlayerMoves();
-        console.log(this.tempMatrix)
+    private generateBonus() {
+        let num = Math.random()
+
+        if (num < 0.4) return 'empty' //probability 0.4
+        else if (num < 0.7) return 'speed' // probability 0.3
+        else return 'cooldown-reduction' //probability 0.3
     }
 
+    public handleBonus(el: HTMLElement) {
+        el.classList.remove('bonus')
+        let bonusType = this.generateBonus()
+        if (bonusType === 'empty') return
 
+        let bonusElement = document.createElement('div')
+        bonusElement.classList.add('bonus-for-player')
+
+        switch (bonusType) {
+            case 'speed':
+                bonusElement.classList.add('bonus-speed')
+                break;
+            case 'cooldown-reduction':
+                bonusElement.classList.add('bonus-cd')
+                break;
+        }
+        el.appendChild(bonusElement)
+    }
+
+    public initializeGame() {
+        if (this.gameStarted) return
+
+        // this.generateMatrix()
+        this.setBlocks()
+        this.spawnPlayers()
+        this.startListeningToPlayerMoves()
+
+        this.gameStarted = true
+    }
+
+    public getCurrentPlayer() {
+        return this.players.find((player) => player.isCurrent())
+    }
+
+    public setGameMatrix(matrix: Array<Array<string>>) {
+        this.tempMatrix = matrix
+    }
 
     public addPlayer(player: PlayerModel) {
+        if (this.gameStarted) return
         this.players.push(player)
+    }
+
+    public removePlayer(id: string) {
+        this.players = this.players.filter((value: PlayerModel) => {
+            if (value.getPlayerId() == id) value.removePlayerModel()
+            return value.getPlayerId() != id
+        })
     }
 }
 

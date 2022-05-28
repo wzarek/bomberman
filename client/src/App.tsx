@@ -13,14 +13,15 @@ function App() {
   const { loading } = useContext(AuthContext)
 
   return (
-      <Routes>
-            <Route path='/' element={ <UsernameForm /> } />
-            <Route element={ <ProtectedRoute /> }>
-              <Route path='/dashboard' element={ <Dashboard /> } />
-            </Route>
-            <Route path='/room/:name' element={ <Room />}/>
-            <Route path='*' />
-      </Routes>
+    <Routes>
+      <Route path='/' element={<UsernameForm />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path='/dashboard' element={<Dashboard />} />
+      </Route>
+      <Route path='/room/:name' element={<Room />} />
+      <Route path='/game/:id' element={<Game />} />
+      <Route path='*' />
+    </Routes>
   )
 }
 
