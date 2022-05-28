@@ -1,5 +1,14 @@
 :root {
+    --bg-color: rgb(42,42,42);
+    --bg-gradient: linear-gradient(90deg, rgba(42,42,42,1) 0%, rgba(20,20,20,1) 100%);
+    --game-bg-color: rgb(73,73,73);
+    --default-font-color: rgb(255,255,255);
+}
 
+body {
+    background-color: var(--bg-color);
+    background-image: var(--bg-gradient);
+    color: var(--default-font-color);
 }
 
 /* -- GAME DASHBOARD --  */
@@ -21,6 +30,7 @@
 /* GAME CONTAINER */
 
 #game-container {
+    background-color: var(--game-bg-color);
     position: relative;
     margin-inline: auto;
     max-width: fit-content;
@@ -42,16 +52,30 @@
     position: relative;
 }
 
+#game-container .game-block.empty {
+    background-color: grey;
+    background-image: url("../img/ground.png");
+    background-position: center;
+    background-size: 105%;
+    opacity: 0.6;
+}
+
 #game-container .game-block.colliding {
     border-color: red;
 }
 
 #game-container .game-block.wall {
     background-color: black;
+    background-image: url("../img/wall.png");
+    background-position: center;
+    background-size: 105%;
 }
 
 #game-container .game-block.bonus {
     background-color: gold;
+    background-image: url("../img/bonus.png");
+    background-position: center;
+    background-size: 105%;
 }
 
 .player {
