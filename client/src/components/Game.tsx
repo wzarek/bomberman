@@ -17,22 +17,25 @@ const Game = () => {
         let game = new GameModel()
 
         socket.on('connect', () => {
-            game.addPlayer(new PlayerModel(game, socket.id, true))
             socket.emit('join-room', params.id)
             socket.emit('player-ready', params.id)
         })
 
-        socket.on('players-in-room', (players: Array<string>) => {
+        socket.on('player-position', (position: number) => {
+            game.addPlayer(new PlayerModel(game, socket.id, true, position))
+        })
+
+        socket.on('players-in-room', (players: Array<Array<any>>) => {
             if (players.length > 0) {
-                players.forEach((player: string) => {
-                    game.addPlayer(new PlayerModel(game, player, false))
+                players.forEach((player: Array<any>) => {
+                    game.addPlayer(new PlayerModel(game, player[0], false, player[1]))
                 })
                 console.log(game)
             }
         })
 
-        socket.on('player-joined', (id: string) => {
-            game.addPlayer(new PlayerModel(game, id, false))
+        socket.on('player-joined', (id: string, position: number) => {
+            game.addPlayer(new PlayerModel(game, id, false, position))
             console.log(`${id} joined the game`)
             console.log(game)
         })
@@ -50,6 +53,9 @@ const Game = () => {
 
         socket.on('max-players-reached', () => {
             alert('Sorry, max players reached in this game')
+            // TODO - alert o tym, ze przekroczona zostala ilosc graczy w grze(chociaz to bedzie w lobby raczej w pozniejszej fazie)
+            // ale za to mozna alert o tym, ze gracz nie nalezy do danego pokoju, wiec nie mozemy go dodac do gry
+            // i dwa buttony - 'zostan i ogladaj gre', 'wyszukiwarka gier'
         })
     }, [])
 

@@ -44,8 +44,15 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             if (roomSize >= 4) {
                 socket.emit('max-players-reached')
             } else {
-                let playersInRoom = io.sockets.adapter.rooms.get(room) as Set<String>
-                socket.emit('players-in-room', Array.from(playersInRoom?.values() || []))
+                let playersInRoom = io.sockets.adapter.rooms.get(room) as Set<string>
+                // socket.emit('players-in-room', Array.from(playersInRoom?.values() || []))
+                let playersArray = Array.from(playersInRoom?.values() || []).map((player) => {
+                    let playerSocket = io.sockets.sockets.get(player)
+                    return [player, playerSocket?.data?.position]
+                })
+                socket.emit('players-in-room', playersArray)
+                socket.data.position = playersInRoom?.size + 1 || 1
+                socket.emit('player-position', socket.data.position)
                 socket.join(room)
                 currentRoom = room
                 console.log(`${socket.id} joined room ${room}`)
@@ -57,7 +64,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         socket.on('player-ready', (room) => {
             console.log(`${socket.id} is ready`)
             socket.data.ready = true
-            socket.to(room).emit('player-joined', socket.id)
+            socket.to(room).emit('player-joined', socket.id, socket?.data?.position)
             let players = io.sockets.adapter.rooms.get(room);
             let playersCount = players?.size || 0
             if (players) {
@@ -67,12 +74,17 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                     if (playerSocket?.data?.ready == true) readyCount++
                 }
                 if (readyCount == 3) io.in(room).emit('start-game')
-                // TODO - pobieranie ilosci wymaganych graczy z ilosci graczy w roomie(z lobby, z sesji)
+                // TODO - pobieranie ilosci wymaganych graczy z ilosci graczy w roomie(z lobby, z sesji) zamiast sztywnej wartosci
             }
         })
 
         socket.on('player-disconnect', (room) => {
             socket.to(room).emit('player-left', socket.id)
+            // DONE - jesli gra sie rozpoczela, a player wyszedl to usuwamy go z mapy
+            // TODO - jesli player sie zreconnectuje(musimy sprawdzic po connect czy gra sie rozpoczela) 
+            // to wysylamy mu AKTUALNA pozycje graczy do poprawnego utworzenia PlayerModel
+            // ale musimy sprawdzic tez, czy rzeczywiscie jest/byl w tym roomie, bo jak nie to moze tylko ogladac
+            // czyli wtedy nie tworzymy modelu z CurrentUser, a kazdy inny obecny w grze(pierwsze X graczy z roomu, gdzie X - ilosc ludzi, ktorzy dolaczyli do gry z Lobby)
         })
 
         socket.on('player-moved', () => {

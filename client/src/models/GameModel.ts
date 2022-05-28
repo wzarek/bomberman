@@ -66,32 +66,37 @@ class GameModel {
     }
 
     private spawnPlayers() {
-        this.players.forEach((player, i) => {
+        this.players.forEach((player) => {
             let currentPlayer = player.getPlayer()
             this.gameContainer.append(currentPlayer)
-            switch (i) {
-                case 0:
+            switch (player.getPlayerPosition()) {
+                case 1:
                     currentPlayer.style.top = '.15vw' // top left
                     currentPlayer.style.left = '.15vw'
-                    break
-                case 1:
-                    currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom right
-                    currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.backgroundColor = 'blue'
                     break
                 case 2:
-                    currentPlayer.style.top = '.15vw' // top right
+                    currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom right
                     currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.backgroundColor = 'brown'
                     break
                 case 3:
+                    currentPlayer.style.top = '.15vw' // top right
+                    currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.backgroundColor = 'green'
+                    break
+                case 4:
                     currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom left
                     currentPlayer.style.left = '.15vw'
+                    currentPlayer.style.backgroundColor = 'pink'
                     break
             }
         })
     }
 
     private getPlayerPosition() {
-        let pl = this.players[0].getPlayer()
+        let player = this.getCurrentPlayer() as PlayerModel
+        let pl = player.getPlayer()
         this.gameMatrix.forEach((arr) => {
             arr.forEach((block) => {
                 block?.classList?.toggle('colliding', this.areColliding(pl, block))
@@ -100,7 +105,7 @@ class GameModel {
 
         const flames = document.querySelectorAll('.flames')
         flames.forEach((flame) => {
-            this.areColliding(pl, flame as HTMLElement) && this.players[0].removeLife();
+            this.areColliding(pl, flame as HTMLElement) && player.removeLife();
         })
 
         const bonuses = document.querySelectorAll('.bonus-for-player')
@@ -150,12 +155,19 @@ class GameModel {
     }
 
     public initializeGame() {
+        if (this.gameStarted) return
+
         this.generateMatrix()
         this.setBlocks()
         this.spawnPlayers()
-        this.startListeningToPlayerMoves();
+        // TODO - naprawic spawn playerow - zmienic z vw na em, zeby kazdy mial ten sam widok
+        this.startListeningToPlayerMoves()
 
-        this.gameStarted = true;
+        this.gameStarted = true
+    }
+
+    public getCurrentPlayer() {
+        return this.players.find((player) => player.isCurrent())
     }
 
     public addPlayer(player: PlayerModel) {
@@ -164,7 +176,10 @@ class GameModel {
     }
 
     public removePlayer(id: string) {
-        this.players = this.players.filter((value: PlayerModel) => (value.getPlayerId() != id))
+        this.players = this.players.filter((value: PlayerModel) => {
+            if (value.getPlayerId() == id) value.removePlayerModel()
+            return value.getPlayerId() != id
+        })
     }
 }
 

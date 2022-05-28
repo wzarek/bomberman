@@ -56,8 +56,8 @@
 
 .player {
     position: absolute;
-    width: 1.75vw;
-    height: 1.75vw;
+    width: 1.75em;
+    height: 1.75em;
     border-radius: 100%;
     background-color: blue;
     transition: top .05s, left .05s;

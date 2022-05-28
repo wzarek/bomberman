@@ -3,6 +3,7 @@ import GameModel from "./GameModel"
 
 class PlayerModel {
     private id: string
+    private position: number
     private gameModel: GameModel;
     private currentPlayer: boolean
     private playerElement: HTMLElement
@@ -13,9 +14,10 @@ class PlayerModel {
     private lives: number
     private damageTimer: any = null
 
-    constructor(gameModel_: GameModel, id_: string, currentPlayer_: boolean, playerSpeed_: number = 1, lives_: number = 3) {
+    constructor(gameModel_: GameModel, id_: string, currentPlayer_: boolean, position_: number, playerSpeed_: number = 1, lives_: number = 3) {
         this.gameModel = gameModel_
         this.id = id_
+        this.position = position_
         this.currentPlayer = currentPlayer_
         this.playerSpeed = playerSpeed_
         this.bombCooldown = 3
@@ -208,7 +210,19 @@ class PlayerModel {
     }
 
     public getPlayerId() {
-        return this.id;
+        return this.id
+    }
+
+    public getPlayerPosition() {
+        return this.position
+    }
+
+    public isCurrent() {
+        return this.currentPlayer
+    }
+
+    public removePlayerModel() {
+        this.playerElement.remove()
     }
 }
 
