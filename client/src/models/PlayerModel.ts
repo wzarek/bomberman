@@ -63,6 +63,7 @@ class PlayerModel {
         gameColliders.forEach((collider) => {
             if (this.isCollidingWithElement(this.playerElement, collider as HTMLElement, direction)) {
                 colliding = true
+                console.log(collider)
             }
         })
         return colliding

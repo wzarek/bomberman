@@ -18,11 +18,15 @@ const Game = () => {
 
         socket.on('connect', () => {
             socket.emit('join-room', params.id)
-            socket.emit('player-ready', params.id)
+        })
+
+        socket.on('game-matrix', (matrix: Array<Array<string>>) => {
+            game.setGameMatrix(matrix)
         })
 
         socket.on('player-position', (position: number) => {
             game.addPlayer(new PlayerModel(game, socket.id, true, position))
+            socket.emit('player-ready', params.id)
         })
 
         socket.on('players-in-room', (players: Array<Array<any>>) => {

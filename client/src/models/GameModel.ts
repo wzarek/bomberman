@@ -22,8 +22,8 @@ class GameModel {
         this.height = height_
         this.bombCooldown = cooldown_
         this.gameContainer = document.querySelector(gameContainer_) as HTMLElement
-        this.tempMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill('empty'));
-        this.gameMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill(0));
+        this.tempMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill('empty'))
+        this.gameMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill(0))
     }
 
     private areColliding(el1: HTMLElement, el2: HTMLElement) {
@@ -37,10 +37,10 @@ class GameModel {
     }
 
     private getRandomBlock() {
-        let num = Math.random();
-        if (num < 0.75) return 'empty';  //probability 0.75
-        else if (num < 0.95) return 'wall'; // probability 0.2
-        else return 'bonus'; //probability 0.05
+        let num = Math.random()
+        if (num < 0.75) return 'empty' //probability 0.75
+        else if (num < 0.95) return 'wall' // probability 0.2
+        else return 'bonus' //probability 0.05
     }
 
     private generateMatrix() {
@@ -129,17 +129,17 @@ class GameModel {
     }
 
     private generateBonus() {
-        let num = Math.random();
+        let num = Math.random()
 
-        if (num < 0.4) return 'empty';  //probability 0.4
-        else if (num < 0.7) return 'speed'; // probability 0.3
-        else return 'cooldown-reduction'; //probability 0.3
+        if (num < 0.4) return 'empty' //probability 0.4
+        else if (num < 0.7) return 'speed' // probability 0.3
+        else return 'cooldown-reduction' //probability 0.3
     }
 
     public handleBonus(el: HTMLElement) {
         el.classList.remove('bonus')
         let bonusType = this.generateBonus()
-        if (bonusType === 'empty') return;
+        if (bonusType === 'empty') return
 
         let bonusElement = document.createElement('div')
         bonusElement.classList.add('bonus-for-player')
@@ -158,10 +158,9 @@ class GameModel {
     public initializeGame() {
         if (this.gameStarted) return
 
-        this.generateMatrix()
+        // this.generateMatrix()
         this.setBlocks()
         this.spawnPlayers()
-        // TODO - naprawic spawn playerow - zmienic z vw na em, zeby kazdy mial ten sam widok
         this.startListeningToPlayerMoves()
 
         this.gameStarted = true
@@ -171,8 +170,12 @@ class GameModel {
         return this.players.find((player) => player.isCurrent())
     }
 
+    public setGameMatrix(matrix: Array<Array<string>>) {
+        this.tempMatrix = matrix
+    }
+
     public addPlayer(player: PlayerModel) {
-        if (this.gameStarted) return;
+        if (this.gameStarted) return
         this.players.push(player)
     }
 
