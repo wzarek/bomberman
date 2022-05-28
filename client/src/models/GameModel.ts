@@ -66,28 +66,29 @@ class GameModel {
     }
 
     private spawnPlayers() {
+        let playerSize = '1.75em'
         this.players.forEach((player) => {
             let currentPlayer = player.getPlayer()
             this.gameContainer.append(currentPlayer)
             switch (player.getPlayerPosition()) {
                 case 1:
-                    currentPlayer.style.top = '.15vw' // top left
-                    currentPlayer.style.left = '.15vw'
+                    currentPlayer.style.top = '.5em' // top left
+                    currentPlayer.style.left = '.5em'
                     currentPlayer.style.backgroundColor = 'blue'
                     break
                 case 2:
-                    currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom right
-                    currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom right
+                    currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
                     currentPlayer.style.backgroundColor = 'brown'
                     break
                 case 3:
-                    currentPlayer.style.top = '.15vw' // top right
-                    currentPlayer.style.left = 'calc(100% - 1.90vw)'
+                    currentPlayer.style.top = '.5em' // top right
+                    currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
                     currentPlayer.style.backgroundColor = 'green'
                     break
                 case 4:
-                    currentPlayer.style.top = 'calc(100% - 1.90vw)' // bottom left
-                    currentPlayer.style.left = '.15vw'
+                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom left
+                    currentPlayer.style.left = '.5em'
                     currentPlayer.style.backgroundColor = 'pink'
                     break
             }
@@ -112,11 +113,11 @@ class GameModel {
         bonuses.forEach((bonus) => {
             if (this.areColliding(pl, bonus as HTMLElement)) {
                 if (bonus.classList.contains('bonus-speed')) {
-                    this.players[0].increaseSpeed()
+                    player.increaseSpeed()
                     bonus.remove()
                 }
                 else if (bonus.classList.contains('bonus-cd')) {
-                    this.players[0].decreaseBombCooldown()
+                    player.decreaseBombCooldown()
                     bonus.remove()
                 }
             }
