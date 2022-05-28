@@ -16,6 +16,7 @@ class BombModel {
         this.gameModel = gameModel_
         this.location = location_
         this.timeToExplode = timeToExplode_
+        console.log('bombed')
 
         this.spawnBomb()
     }

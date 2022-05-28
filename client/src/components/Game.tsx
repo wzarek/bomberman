@@ -10,6 +10,7 @@ type Props = {
 }
 
 const Game = () => {
+    const [waiting, setWaiting] = useState(true)
     const params = useParams()
     const socket = io('http://localhost:3000/')
 
@@ -20,26 +21,28 @@ const Game = () => {
             socket.emit('join-room', params.id)
         })
 
+        // WAITING
+
         socket.on('game-matrix', (matrix: Array<Array<string>>) => {
             game.setGameMatrix(matrix)
         })
 
         socket.on('player-position', (position: number) => {
-            game.addPlayer(new PlayerModel(game, socket.id, true, position))
+            game.addPlayer(new PlayerModel(game, socket.id, position, true, socket))
             socket.emit('player-ready', params.id)
         })
 
         socket.on('players-in-room', (players: Array<Array<any>>) => {
             if (players.length > 0) {
                 players.forEach((player: Array<any>) => {
-                    game.addPlayer(new PlayerModel(game, player[0], false, player[1]))
+                    game.addPlayer(new PlayerModel(game, player[0], player[1]))
                 })
                 console.log(game)
             }
         })
 
         socket.on('player-joined', (id: string, position: number) => {
-            game.addPlayer(new PlayerModel(game, id, false, position))
+            game.addPlayer(new PlayerModel(game, id, position))
             console.log(`${id} joined the game`)
             console.log(game)
         })
@@ -52,8 +55,18 @@ const Game = () => {
 
         socket.on('start-game', () => {
             console.log('starting...')
+            setWaiting(false)
             game.initializeGame()
         })
+
+        // GAME
+
+        socket.on('move-player', (id: string, position: { [name: string]: string }) => {
+            let playerToMove = game.getPlayerById(id)
+            playerToMove?.setPlayerPosition(position)
+        })
+
+        // PLAYER NOT IN CURRENT GAME
 
         socket.on('max-players-reached', () => {
             alert('Sorry, max players reached in this game')
@@ -70,7 +83,7 @@ const Game = () => {
                 Game: {params.id}
             </p>
             <div id='game-container'>
-
+                {waiting ? <h2>Waiting for players...</h2> : <></>}
             </div>
         </>
     )

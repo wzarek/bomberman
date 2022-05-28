@@ -70,7 +70,7 @@ class GameModel {
         this.players.forEach((player) => {
             let currentPlayer = player.getPlayer()
             this.gameContainer.append(currentPlayer)
-            switch (player.getPlayerPosition()) {
+            switch (player.getPlayerStartingPosition()) {
                 case 1:
                     currentPlayer.style.top = '.5em' // top left
                     currentPlayer.style.left = '.5em'
@@ -168,6 +168,10 @@ class GameModel {
 
     public getCurrentPlayer() {
         return this.players.find((player) => player.isCurrent())
+    }
+
+    public getPlayerById(id: string) {
+        return this.players.find((player) => player.getPlayerId() === id)
     }
 
     public setGameMatrix(matrix: Array<Array<string>>) {

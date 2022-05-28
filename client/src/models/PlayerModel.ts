@@ -1,7 +1,9 @@
+import { Socket } from "socket.io-client"
 import BombModel from "./BombModel"
 import GameModel from "./GameModel"
 
 class PlayerModel {
+    private socket: any
     private id: string
     private position: number
     private gameModel: GameModel;
@@ -14,7 +16,8 @@ class PlayerModel {
     private lives: number
     private damageTimer: any = null
 
-    constructor(gameModel_: GameModel, id_: string, currentPlayer_: boolean, position_: number, playerSpeed_: number = 1, lives_: number = 3) {
+    constructor(gameModel_: GameModel, id_: string, position_: number, currentPlayer_: boolean = false, socket_: any = null, playerSpeed_: number = 1, lives_: number = 3) {
+        this.socket = socket_
         this.gameModel = gameModel_
         this.id = id_
         this.position = position_
@@ -53,8 +56,13 @@ class PlayerModel {
         }
     }
 
-    private updatePosition() {
+    private pixelsToEms(value: number) {
+        let defaultFontSize = 16
+        return value / defaultFontSize
+    }
 
+    private updatePosition() {
+        this.socket.emit('player-moved', { top: this.playerElement.style.top, left: this.playerElement.style.left })
     }
 
     private isColliding(direction: string) {
@@ -127,6 +135,7 @@ class PlayerModel {
     }
 
     private tryBomb() {
+        // TODO - bomba pojawia sie w pozycji playera, nie w jakims bloku
         if (!this.bombTimeout) {
             this.bombTimeout = setTimeout(() => { this.bombTimeout = null }, this.bombCooldown * 1000)
             let block = this.whereToBomb()
@@ -214,8 +223,13 @@ class PlayerModel {
         return this.id
     }
 
-    public getPlayerPosition() {
+    public getPlayerStartingPosition() {
         return this.position
+    }
+
+    public setPlayerPosition(value: { [name: string]: string }) {
+        this.playerElement.style.top = value['top']
+        this.playerElement.style.left = value['left']
     }
 
     public isCurrent() {
