@@ -101,8 +101,8 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             // czyli wtedy nie tworzymy modelu z CurrentUser, a kazdy inny obecny w grze(pierwsze X graczy z roomu, gdzie X - ilosc ludzi, ktorzy dolaczyli do gry z Lobby)
         })
 
-        socket.on('player-moved', () => {
-            console.log(`${socket.id} moved`)
+        socket.on('player-moved', (position: object) => {
+            socket.to(currentRoom).emit('move-player', socket.id, position)
         })
 
         socket.on('player-bombed', () => {
