@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { io } from 'socket.io-client'
 import GameModel from '../models/GameModel'
 import PlayerModel from '../models/PlayerModel'
 
@@ -8,28 +10,54 @@ type Props = {
 }
 
 const Game = () => {
-    const [game, setGame]: [GameModel | undefined, any] = useState()
-    const [players, setPlayers]: [Array<PlayerModel> | undefined, any] = useState()
+    const params = useParams()
+    const socket = io('http://localhost:3000/')
 
     useEffect(() => {
-        let currGame = new GameModel()
-        setGame(currGame)
-        setPlayers([new PlayerModel(currGame as GameModel, 1235, true), new PlayerModel(currGame as GameModel, 1236, false)])
-    }, [])
+        let game = new GameModel()
 
-    useEffect(() => {
-        players?.forEach((player) => {
-            game?.addPlayer(player)
+        socket.on('connect', () => {
+            game.addPlayer(new PlayerModel(game, socket.id, true))
+            socket.emit('join-room', params.id)
+            socket.emit('player-ready', params.id)
         })
-        const unsubscribe = game?.initializeGame()
-        return unsubscribe
-    }, [game, players])
+
+        socket.on('players-in-room', (players: Array<string>) => {
+            if (players.length > 0) {
+                players.forEach((player: string) => {
+                    game.addPlayer(new PlayerModel(game, player, false))
+                })
+                console.log(game)
+            }
+        })
+
+        socket.on('player-joined', (id: string) => {
+            game.addPlayer(new PlayerModel(game, id, false))
+            console.log(`${id} joined the game`)
+            console.log(game)
+        })
+
+        socket.on('player-left', (id: string) => {
+            game.removePlayer(id)
+            console.log(`${id} left the game`)
+            console.log(game)
+        })
+
+        socket.on('start-game', () => {
+            console.log('starting...')
+            game.initializeGame()
+        })
+
+        socket.on('max-players-reached', () => {
+            alert('Sorry, max players reached in this game')
+        })
+    }, [])
 
 
     return (
         <>
             <p>
-                Current lives: 3
+                Game: {params.id}
             </p>
             <div id='game-container'>
 

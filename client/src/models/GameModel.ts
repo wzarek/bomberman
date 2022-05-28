@@ -162,6 +162,10 @@ class GameModel {
         if (this.gameStarted) return;
         this.players.push(player)
     }
+
+    public removePlayer(id: string) {
+        this.players = this.players.filter((value: PlayerModel) => (value.getPlayerId() != id))
+    }
 }
 
 export default GameModel

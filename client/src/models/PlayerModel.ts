@@ -2,7 +2,7 @@ import BombModel from "./BombModel"
 import GameModel from "./GameModel"
 
 class PlayerModel {
-    private id: number
+    private id: string
     private gameModel: GameModel;
     private currentPlayer: boolean
     private playerElement: HTMLElement
@@ -13,7 +13,7 @@ class PlayerModel {
     private lives: number
     private damageTimer: any = null
 
-    constructor(gameModel_: GameModel, id_: number, currentPlayer_: boolean, playerSpeed_: number = 1, lives_: number = 3) {
+    constructor(gameModel_: GameModel, id_: string, currentPlayer_: boolean, playerSpeed_: number = 1, lives_: number = 3) {
         this.gameModel = gameModel_
         this.id = id_
         this.currentPlayer = currentPlayer_
@@ -205,6 +205,10 @@ class PlayerModel {
 
     public getPlayerLives() {
         return this.lives
+    }
+
+    public getPlayerId() {
+        return this.id;
     }
 }
 

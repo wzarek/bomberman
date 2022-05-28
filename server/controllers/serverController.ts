@@ -7,21 +7,21 @@ import { Request, Response } from "express";
 import { Session } from 'express-session'
 import { IncomingMessage } from "http";
 
-require('dotenv').config({ path: path.join(__dirname, '../.env')})
+require('dotenv').config({ path: path.join(__dirname, '../.env') })
 
 const expire: number = parseInt(process.env.COOKIE_MAX_AGE as string)
 
 declare module 'express-session' {
     export interface SessionData {
-      user: { [key: string]: any }
+        user: { [key: string]: any }
     }
-  }
+}
 
 declare module "http" {
-interface IncomingMessage {
-    cookieHolder?: string,
-    session: Session & {
-        user: { [key: string]: any }
+    interface IncomingMessage {
+        cookieHolder?: string,
+        session: Session & {
+            user: { [key: string]: any }
         }
     }
 }
@@ -32,7 +32,7 @@ const RedisStore = connectRedis(session)
 const sessionMiddleware = session({
     name: 'sid',
     secret: process.env.COOKIE_SECRET ?? 'my-secret',
-    store: new RedisStore( { client: redisClient }),
+    store: new RedisStore({ client: redisClient }),
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -52,7 +52,7 @@ const corsConfig = {
             setHeader(key: string, values: string[]) {
                 req.cookieHolder = values[0];
             },
-            writeHead() {},
+            writeHead() { },
         };
         sessionMiddleware(req as Request, fakeRes as unknown as Response, () => {
             if (req.session) {
