@@ -101,6 +101,7 @@ body {
     background-position: center;
     background-size: 100%;
     transition: top .05s, left .05s;
+    z-index: 3;
 }
 
 .bomb {
@@ -110,6 +111,7 @@ body {
     background-image: url("../img/bomb.png");
     background-position: center;
     background-size: 100%;
+    z-index: 1;
 }
 
 [data-color='red'] {
@@ -131,7 +133,8 @@ body {
 .flames {
     position: absolute;
     background-color: darkred;
-    transform: translate(-3em, 0);
+    /* transform: translate(-3em, 0); */
+    z-index: 2;
 }
 
 .bonus-for-player {

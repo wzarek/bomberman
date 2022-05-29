@@ -200,14 +200,21 @@ class PlayerModel {
                 iterations: 1,
             }
             this.playerElement.animate(animKeframes, animTiming)
+
             this.lives -= 1
             this.damageTimer = setTimeout(() => this.damageTimer = null, 1000)
+
+            let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
+            playerLives.textContent = `Lives: ${this.lives}`
+
             if (this.lives <= 0) this.handleDead()
         }
     }
 
     private handleDead() {
-        alert(`Player ${this.id} lost!`)
+        let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
+        playerLives.textContent = 'dead'
+        this.playerElement.remove()
     }
 
     public getPlayer() {

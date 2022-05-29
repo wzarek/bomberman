@@ -3,9 +3,12 @@ import GameModel from "./GameModel"
 class BombModel {
     private gameModel: GameModel
     private location: HTMLElement = document.querySelector('#game-container') as HTMLElement
+
     private color: string
     private position: { [name: string]: string }
+
     private timeToExplode: number // sec
+
     private bombElement: HTMLElement | null = null
 
     /**
@@ -19,6 +22,7 @@ class BombModel {
         this.position = position_
         this.color = color_
         this.timeToExplode = timeToExplode_
+
         this.spawnBomb()
     }
 
@@ -29,11 +33,13 @@ class BombModel {
         this.bombElement.style.top = this.position['top']
         this.bombElement.style.left = this.position['left']
         this.bombElement.setAttribute('data-color', this.color)
+
         setTimeout(() => this.explode(), this.timeToExplode * 1000)
     }
 
     private explode() {
         this.bombElement?.remove()
+
         this.createFlames()
     }
 
@@ -60,12 +66,37 @@ class BombModel {
         flames.style.width = '6em'
         flames.style.height = '6em'
         flames.style.top = `calc(${this.position['top']} - 2.5em)`
-        flames.style.left = `calc(${this.position['left']} + .5em)`
+        flames.style.left = `calc(${this.position['left']} - 2.5em)`
+
+        const animKeframes = [
+            { transform: 'scale(0)' },
+            { transform: 'scale(1)' }
+        ]
+        const animTiming = {
+            duration: 100,
+            iterations: 1,
+        }
+
         this.location.appendChild(flames)
+        flames.animate(animKeframes, animTiming)
         setTimeout(() => {
-            flames.remove()
+            this.removeFlames(flames)
         }, 1000)
+
         this.checkFlamesCollision(flames)
+    }
+
+    private removeFlames(flames: HTMLElement) {
+        const animKeframes = [
+            { opacity: 1 },
+            { opacity: 0 }
+        ]
+        const animTiming = {
+            duration: 100,
+            iterations: 1,
+        }
+        flames.animate(animKeframes, animTiming)
+        flames.remove()
     }
 }
 
