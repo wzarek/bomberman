@@ -2,22 +2,21 @@ import GameModel from "./GameModel"
 
 class BombModel {
     private gameModel: GameModel
-    private location: HTMLElement
+    private location: HTMLElement = document.querySelector('#game-container') as HTMLElement
+    private position: { [name: string]: string }
     private timeToExplode: number // sec
     private bombElement: HTMLElement | null = null
 
     /**
      * Creates a bomb in specified location
      * @param gameModel_ is a game model needed for bomb-game communication
-     * @param location_ is an element, where bomb will be put into
+     * @param position_ is a bomb position(player position when he put a bomb)
      * @optional @param timeToExplode_ is a time value in seconds, after which bomb will explode
      */
-    constructor(gameModel_: GameModel, location_: HTMLElement, timeToExplode_: number = 3) {
+    constructor(gameModel_: GameModel, position_: { [name: string]: string }, timeToExplode_: number = 3) {
         this.gameModel = gameModel_
-        this.location = location_
+        this.position = position_
         this.timeToExplode = timeToExplode_
-        console.log('bombed')
-
         this.spawnBomb()
     }
 
@@ -25,6 +24,8 @@ class BombModel {
         this.bombElement = document.createElement('div')
         this.bombElement.classList.add('bomb')
         this.location.appendChild(this.bombElement)
+        this.bombElement.style.top = this.position['top']
+        this.bombElement.style.left = this.position['left']
         setTimeout(() => this.explode(), this.timeToExplode * 1000)
     }
 
@@ -55,6 +56,8 @@ class BombModel {
         flames.classList.add('flames')
         flames.style.width = '6em'
         flames.style.height = '6em'
+        flames.style.top = `calc(${this.position['top']} - 2.5em)`
+        flames.style.left = `calc(${this.position['left']} + .5em)`
         this.location.appendChild(flames)
         setTimeout(() => {
             flames.remove()
