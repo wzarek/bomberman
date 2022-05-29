@@ -117,7 +117,6 @@ class PlayerModel {
     }
 
     private tryBomb() {
-        // TODO - bomba pojawia sie w pozycji playera, nie w jakims bloku
         if (!this.bombTimeout) {
             this.bombTimeout = setTimeout(() => { this.bombTimeout = null }, this.bombCooldown * 1000)
             this.putBomb({ top: this.playerElement.style.top, left: this.playerElement.style.left })
