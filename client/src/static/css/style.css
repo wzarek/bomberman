@@ -89,9 +89,12 @@ body {
 
 .bomb {
     position: absolute;
-    width: 1vw;
-    height: 1vw;
-    background-color: red;
+    width: 1.5em;
+    height: 1.5em;
+    /* background-color: red; */
+    background-image: url("../img/bomb.png");
+    background-position: center;
+    background-size: 100%;
 }
 
 .flames {
