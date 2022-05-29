@@ -3,6 +3,7 @@ import GameModel from "./GameModel"
 class BombModel {
     private gameModel: GameModel
     private location: HTMLElement = document.querySelector('#game-container') as HTMLElement
+    private color: string
     private position: { [name: string]: string }
     private timeToExplode: number // sec
     private bombElement: HTMLElement | null = null
@@ -13,9 +14,10 @@ class BombModel {
      * @param position_ is a bomb position(player position when he put a bomb)
      * @optional @param timeToExplode_ is a time value in seconds, after which bomb will explode
      */
-    constructor(gameModel_: GameModel, position_: { [name: string]: string }, timeToExplode_: number = 3) {
+    constructor(gameModel_: GameModel, position_: { [name: string]: string }, color_: string, timeToExplode_: number = 3) {
         this.gameModel = gameModel_
         this.position = position_
+        this.color = color_
         this.timeToExplode = timeToExplode_
         this.spawnBomb()
     }
@@ -26,6 +28,7 @@ class BombModel {
         this.location.appendChild(this.bombElement)
         this.bombElement.style.top = this.position['top']
         this.bombElement.style.left = this.position['left']
+        this.bombElement.setAttribute('data-color', this.color)
         setTimeout(() => this.explode(), this.timeToExplode * 1000)
     }
 

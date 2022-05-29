@@ -1,14 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800&display=swap');
+
 :root {
     --bg-color: rgb(42,42,42);
     --bg-gradient: linear-gradient(90deg, rgba(42,42,42,1) 0%, rgba(20,20,20,1) 100%);
     --game-bg-color: rgb(73,73,73);
     --default-font-color: rgb(255,255,255);
+    --default-font : 'Inconsolata', monospace;
 }
 
 body {
     background-color: var(--bg-color);
     background-image: var(--bg-gradient);
     color: var(--default-font-color);
+    font-family: var(--default-font);
 }
 
 /* -- GAME DASHBOARD --  */
@@ -29,6 +33,13 @@ body {
 
 /* GAME CONTAINER */
 
+.game {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 3em;
+    border: 5px solid black;
+}
+
 #game-container {
     background-color: var(--game-bg-color);
     position: relative;
@@ -41,6 +52,8 @@ body {
     grid-template-rows: repeat(var(--grid-height), 1fr);
     outline: 5px solid black;
 }
+
+/* blocks */
 
 #game-container .game-block {
     background-image: url("../img/ground.png");
@@ -78,12 +91,15 @@ body {
     background-size: 105%;
 }
 
+/* models */
+
 .player {
     position: absolute;
     width: 1.75em;
     height: 1.75em;
-    border-radius: 100%;
-    background-color: blue;
+    background-image: url("../img/player.png");
+    background-position: center;
+    background-size: 100%;
     transition: top .05s, left .05s;
 }
 
@@ -91,10 +107,25 @@ body {
     position: absolute;
     width: 1.5em;
     height: 1.5em;
-    /* background-color: red; */
     background-image: url("../img/bomb.png");
     background-position: center;
     background-size: 100%;
+}
+
+[data-color='red'] {
+    filter: hue-rotate(305deg) brightness(130%) contrast(200%);
+}
+
+[data-color='green'] {
+    filter: hue-rotate(100deg) brightness(140%) contrast(200%);
+}
+
+[data-color='blue'] {
+    filter: hue-rotate(160deg) brightness(150%) contrast(200%);
+}
+
+[data-color='gold'] {
+    filter: hue-rotate(10deg) brightness(160%) contrast(200%);
 }
 
 .flames {
@@ -114,4 +145,37 @@ body {
 
 .bonus-for-player.bonus-cd {
     background-color: royalblue;
+}
+
+/* playerlist */
+
+.game-playerlist {
+    box-sizing: border-box;
+    outline: 5px solid black;
+    width: 20%;
+    height: 100%;
+    padding: 1rem;
+}
+
+.playerlist-player {
+    display: flex;
+    justify-content:  space-between;
+    align-items: center;
+    margin-top: 2em;
+}
+
+.playerlist-player.current {
+    color: red;
+}
+
+.playerlist-image {
+    width: 2em;
+    height: 2em;
+    background-image: url("../img/player.png");
+    background-position: center;
+    background-size: 100%;
+}
+
+.playerlist-name {
+    /* */
 }

@@ -21,7 +21,7 @@ class GameModel {
         this.width = width_
         this.height = height_
         this.bombCooldown = cooldown_
-        this.gameContainer = document.querySelector(gameContainer_) as HTMLElement
+        this.gameContainer = document.querySelector(gameContainer_) as HTMLElement // TODO - dla bezpieczenstwa stylizacji(element nie musi miec id game-container) dodajemy data-game='container' i po tym robimy cssa
         this.tempMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill('empty'))
         this.gameMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill(0))
     }
@@ -74,22 +74,22 @@ class GameModel {
                 case 1:
                     currentPlayer.style.top = '.5em' // top left
                     currentPlayer.style.left = '.5em'
-                    currentPlayer.style.backgroundColor = 'blue'
+                    player.setPlayerColor('blue')
                     break
                 case 2:
                     currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom right
                     currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
-                    currentPlayer.style.backgroundColor = 'brown'
+                    player.setPlayerColor('gold')
                     break
                 case 3:
                     currentPlayer.style.top = '.5em' // top right
                     currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
-                    currentPlayer.style.backgroundColor = 'green'
+                    player.setPlayerColor('green')
                     break
                 case 4:
                     currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom left
                     currentPlayer.style.left = '.5em'
-                    currentPlayer.style.backgroundColor = 'pink'
+                    player.setPlayerColor('red')
                     break
             }
         })

@@ -78,17 +78,20 @@ const Game = () => {
 
 
     return (
-        <div className='game'>
-            <p>
+        <>
+            <h1>
                 Game: {params.id}
-            </p>
-            <div id='game-container'>
-                {waiting ? <h2>Waiting for players...</h2> : <></>}
-            </div>
-            <div className='game-playerlist'>
+            </h1>
+            <div className='game'>
 
+                <div id='game-container'>
+                    {waiting ? <h2>Waiting for players...</h2> : <></>}
+                </div>
+                <div className='game-playerlist'>
+                    <h2>Players:</h2>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

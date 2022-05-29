@@ -5,26 +5,39 @@ import GameModel from "./GameModel"
 class PlayerModel {
     private socket: any
     private id: string
-    private position: number
     private gameModel: GameModel;
+
     private currentPlayer: boolean
+    private position: number
+    private color: string = 'blue'
     private playerElement: HTMLElement
+
     private collisionGap: number = 0.25
+
     private playerSpeed: number
     private bombCooldown: number
     private bombTimeout: any = null
     private lives: number
     private damageTimer: any = null
 
+    private gameElement: any = null // TODO - na konstruktorze dodajemy element gry, nie ustawiamy go sztywno w kodzie
+    private listElement: HTMLElement
+    private playerInListElement: HTMLElement | null = null
+
     constructor(gameModel_: GameModel, id_: string, position_: number, currentPlayer_: boolean = false, socket_: any = null, playerSpeed_: number = 1, lives_: number = 3) {
         this.socket = socket_
-        this.gameModel = gameModel_
         this.id = id_
-        this.position = position_
+        this.gameModel = gameModel_
+
         this.currentPlayer = currentPlayer_
+        this.position = position_
+
         this.playerSpeed = playerSpeed_
         this.bombCooldown = 3
         this.lives = lives_
+
+        this.listElement = document.querySelector('.game-playerlist') as HTMLElement
+        this.appendPlayerInList()
 
         let player = document.createElement('div')
         player.classList.add('player')
@@ -33,6 +46,29 @@ class PlayerModel {
         if (currentPlayer_) {
             document.addEventListener('keydown', (evt) => this.handleKeyDown(evt as KeyboardEvent))
         }
+    }
+
+    private appendPlayerInList() {
+        let playerInList = document.createElement('div')
+        playerInList.classList.add('playerlist-player')
+        if (this.currentPlayer) playerInList.classList.add('current')
+
+        let playerImage = document.createElement('div')
+        playerImage.classList.add('playerlist-image')
+        playerInList.appendChild(playerImage)
+
+        let playerName = document.createElement('div')
+        playerName.classList.add('playerlist-name')
+        playerName.textContent = this.id
+        playerInList.appendChild(playerName)
+
+        let playerLives = document.createElement('div')
+        playerLives.classList.add('playerlist-lives')
+        playerLives.textContent = `Lives: ${this.lives}`
+        playerInList.appendChild(playerLives)
+
+        this.listElement.appendChild(playerInList)
+        this.playerInListElement = playerInList
     }
 
     private isCollidingWithElement(el1: HTMLElement, el2: HTMLElement, direction: string = '') {
@@ -113,7 +149,7 @@ class PlayerModel {
     }
 
     private putBomb(position: { [name: string]: string }) {
-        let bomb = new BombModel(this.gameModel, position)
+        let bomb = new BombModel(this.gameModel, position, this.color)
     }
 
     private tryBomb() {
@@ -203,6 +239,14 @@ class PlayerModel {
 
     public getPlayerStartingPosition() {
         return this.position
+    }
+
+    public setPlayerColor(colorToSet: string) {
+        this.color = colorToSet
+        this.playerElement.setAttribute('data-color', colorToSet)
+
+        let playerImage = this.playerInListElement?.querySelector('.playerlist-image')
+        playerImage?.setAttribute('data-color', colorToSet)
     }
 
     public setPlayerPosition(value: { [name: string]: string }) {
