@@ -112,36 +112,15 @@ class PlayerModel {
         this.updatePosition()
     }
 
-    private isOnBlock(pl: HTMLElement, el: HTMLElement) {
-        let elVal = el.getBoundingClientRect()
-        let playerVal = pl.getBoundingClientRect()
-        return ((playerVal.bottom <= elVal.top) ||
-            (playerVal.top >= elVal.bottom) ||
-            (playerVal.right <= elVal.left) ||
-            (playerVal.left >= elVal.right))
-    }
-
-    private whereToBomb() {
-        const gameColliders = document.querySelectorAll('.game-block.empty.colliding') as NodeListOf<HTMLElement>
-        let el = null
-        gameColliders.forEach((collider) => {
-            this.isOnBlock(this.playerElement, collider as HTMLElement) && (el = collider)
-        })
-        return el
-    }
-
-    private putBomb(el: HTMLElement) {
-        let bomb = new BombModel(this.gameModel, el)
+    private putBomb(position: { [name: string]: string }) {
+        let bomb = new BombModel(this.gameModel, position)
     }
 
     private tryBomb() {
         // TODO - bomba pojawia sie w pozycji playera, nie w jakims bloku
         if (!this.bombTimeout) {
             this.bombTimeout = setTimeout(() => { this.bombTimeout = null }, this.bombCooldown * 1000)
-            let block = this.whereToBomb()
-            if (block) {
-                this.putBomb(block as HTMLElement)
-            }
+            this.putBomb({ top: this.playerElement.style.top, left: this.playerElement.style.left })
         }
     }
 
