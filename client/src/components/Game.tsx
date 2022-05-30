@@ -62,6 +62,7 @@ const Game = () => {
         // GAME
 
         socket.on('move-player', (id: string, position: { [name: string]: string }) => {
+            // TODO - odebranie 'ilosci' przesuniec wraz ze speedem playera
             let playerToMove = game.getPlayerById(id)
             playerToMove?.setPlayerPosition(position)
         })

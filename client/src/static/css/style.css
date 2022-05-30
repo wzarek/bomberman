@@ -159,6 +159,7 @@ body {
     width: 20%;
     height: 100%;
     padding: 1rem;
+    border-radius: 1em;
 }
 
 .playerlist-player {
