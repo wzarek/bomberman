@@ -16,7 +16,7 @@ class PlayerModel {
 
     private playerSpeed: number
     private bombCooldown: number
-    private bombTimeout: any = null
+    private canBomb: boolean = true
     private lives: number
     private damageTimer: any = null
 
@@ -100,6 +100,7 @@ class PlayerModel {
     }
 
     private updatePosition() {
+        // TODO - wysłanie movement.left i movement.top wraz ze speedem playera
         this.socket.emit('player-moved', { top: this.playerElement.style.top, left: this.playerElement.style.left })
     }
 
@@ -171,8 +172,10 @@ class PlayerModel {
     }
 
     private tryBomb() {
-        if (!this.bombTimeout) {
-            this.bombTimeout = setTimeout(() => { this.bombTimeout = null }, this.bombCooldown * 1000)
+        if (this.canBomb) {
+            let cd = this.bombCooldown
+            this.canBomb = false
+            setTimeout(() => { this.canBomb = true }, cd * 1000)
             this.putBomb({ top: this.playerElement.style.top, left: this.playerElement.style.left })
         }
     }
@@ -235,6 +238,10 @@ class PlayerModel {
         this.playerElement.remove()
     }
 
+    public removePlayerModel() {
+        this.playerElement.remove()
+    }
+
     public getPlayer() {
         return this.playerElement
     }
@@ -250,7 +257,7 @@ class PlayerModel {
 
     public decreaseBombCooldown() {
         if (this.bombCooldown <= 0.5) return
-        this.setBombCooldown(this.bombCooldown + 0.5)
+        this.setBombCooldown(this.bombCooldown - 0.5)
         console.log(this.bombCooldown)
     }
 
@@ -283,8 +290,14 @@ class PlayerModel {
         return this.currentPlayer
     }
 
-    public removePlayerModel() {
-        this.playerElement.remove()
+    public handleRemovePlayer() {
+        let playerInfo = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
+        playerInfo.textContent = 'disconnected'
+        setTimeout(() => {
+            this.playerInListElement?.remove()
+        }, 1000)
+
+        this.removePlayerModel()
     }
 }
 

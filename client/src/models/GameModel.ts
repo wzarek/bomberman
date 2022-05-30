@@ -4,10 +4,14 @@ class GameModel {
     private width: number
     private height: number
     private gameContainer: HTMLElement
+
     private gameStarted: boolean = false;
+
     private players: Array<PlayerModel> = []
+
     private tempMatrix: Array<Array<string>>
     private gameMatrix: Array<Array<HTMLElement>>
+
     private bombCooldown: number // sec
 
     /**
@@ -17,7 +21,7 @@ class GameModel {
      * @param cooldown_ is a time value in seconds, bomb use cooldown for users
      * @param gameContainer_ is a selector for game main container
      */
-    constructor(width_: number = 30, height_: number = 15, cooldown_: number = 3, gameContainer_: string = "#game-container") {
+    constructor(gameStarted_: boolean = false, players_: { [name: string]: string } = {}, width_: number = 30, height_: number = 15, cooldown_: number = 3, gameContainer_: string = "#game-container") {
         this.width = width_
         this.height = height_
         this.bombCooldown = cooldown_
@@ -185,7 +189,7 @@ class GameModel {
 
     public removePlayer(id: string) {
         this.players = this.players.filter((value: PlayerModel) => {
-            if (value.getPlayerId() == id) value.removePlayerModel()
+            if (value.getPlayerId() == id) value.handleRemovePlayer()
             return value.getPlayerId() != id
         })
     }
