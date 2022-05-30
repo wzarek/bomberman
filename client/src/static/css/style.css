@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200;300;400;500;600;700;800&display=swap');
 
 :root {
-    --bg-color: rgb(42,42,42);
-    --bg-gradient: linear-gradient(90deg, rgba(42,42,42,1) 0%, rgba(20,20,20,1) 100%);
+    --bg-color: rgb(22,22,22);
     --game-bg-color: rgb(73,73,73);
     --default-font-color: rgb(255,255,255);
     --default-font : 'Inconsolata', monospace;
@@ -10,7 +9,6 @@
 
 body {
     background-color: var(--bg-color);
-    background-image: var(--bg-gradient);
     color: var(--default-font-color);
     font-family: var(--default-font);
 }
@@ -37,10 +35,10 @@ body {
     display: flex;
     justify-content: space-evenly;
     padding: 3em;
-    border: 5px solid black;
 }
 
 #game-container {
+    box-sizing: border-box;
     background-color: var(--game-bg-color);
     position: relative;
     margin-inline: auto;
@@ -51,6 +49,8 @@ body {
     grid-template-columns: repeat(var(--grid-width), 1fr);
     grid-template-rows: repeat(var(--grid-height), 1fr);
     outline: 5px solid black;
+    border-radius: 1em;
+    overflow: hidden;
 }
 
 /* blocks */
@@ -132,8 +132,9 @@ body {
 
 .flames {
     position: absolute;
-    background-color: darkred;
-    /* transform: translate(-3em, 0); */
+    background-image: url("../img/flames.png");
+    background-position: center;
+    background-size: 100%;
     z-index: 2;
 }
 

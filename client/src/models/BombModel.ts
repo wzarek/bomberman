@@ -79,11 +79,16 @@ class BombModel {
 
         this.location.appendChild(flames)
         flames.animate(animKeframes, animTiming)
+
+        const flamesInterval = setInterval(() => {
+            this.checkFlamesCollision(flames)
+        }, 10)
+
         setTimeout(() => {
             this.removeFlames(flames)
+            clearInterval(flamesInterval)
         }, 1000)
 
-        this.checkFlamesCollision(flames)
     }
 
     private removeFlames(flames: HTMLElement) {
