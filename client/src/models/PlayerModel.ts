@@ -24,6 +24,8 @@ class PlayerModel {
     private listElement: HTMLElement
     private playerInListElement: HTMLElement | null = null
 
+    private movement: { [name: string]: number } = { left: 0, top: 0 }
+
     constructor(gameModel_: GameModel, id_: string, position_: number, currentPlayer_: boolean = false, socket_: any = null, playerSpeed_: number = 1, lives_: number = 3) {
         this.socket = socket_
         this.id = id_
@@ -132,16 +134,32 @@ class PlayerModel {
     private startMoving(direction: string) {
         switch (direction) {
             case 'left':
-                if (this.canMove('left')) this.playerElement.style.left = `calc(${this.playerElement.style.left} - ${this.playerSpeed * 0.25}vw)`
+                if (this.canMove('left')) {
+                    let leftPosition = window.getComputedStyle(this.playerElement).getPropertyValue('left')
+                    this.playerElement.style.left = `calc(${leftPosition} - ${this.playerSpeed * 0.25}vw)`
+                    this.movement.left--
+                }
                 break
             case 'right':
-                if (this.canMove('right')) this.playerElement.style.left = `calc(${this.playerElement.style.left} + ${this.playerSpeed * 0.25}vw)`
+                if (this.canMove('right')) {
+                    let leftPosition = window.getComputedStyle(this.playerElement).getPropertyValue('left')
+                    this.playerElement.style.left = `calc(${leftPosition} + ${this.playerSpeed * 0.25}vw)`
+                    this.movement.left++
+                }
                 break
             case 'up':
-                if (this.canMove('up')) this.playerElement.style.top = `calc(${this.playerElement.style.top} - ${this.playerSpeed * 0.25}vw)`
+                if (this.canMove('up')) {
+                    let topPosition = window.getComputedStyle(this.playerElement).getPropertyValue('top')
+                    this.playerElement.style.top = `calc(${topPosition} - ${this.playerSpeed * 0.25}vw)`
+                    this.movement.top--
+                }
                 break
             case 'down':
-                if (this.canMove('down')) this.playerElement.style.top = `calc(${this.playerElement.style.top} + ${this.playerSpeed * 0.25}vw)`
+                if (this.canMove('down')) {
+                    let topPosition = window.getComputedStyle(this.playerElement).getPropertyValue('top')
+                    this.playerElement.style.top = `calc(${topPosition} + ${this.playerSpeed * 0.25}vw)`
+                    this.movement.top++
+                }
                 break
         }
 

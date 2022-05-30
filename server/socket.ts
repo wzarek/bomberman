@@ -98,7 +98,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                     let playerSocket = io.sockets.sockets.get(player)
                     if (playerSocket?.data?.ready == true) readyCount++
                 }
-                if (readyCount == 3) io.in(room).emit('start-game')
+                if (readyCount == 1) io.in(room).emit('start-game')
                 // TODO - pobieranie ilosci wymaganych graczy z ilosci graczy w roomie(z lobby, z sesji) zamiast sztywnej wartosci
             }
         })
