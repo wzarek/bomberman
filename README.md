@@ -41,6 +41,23 @@ Then, **choose** a lobby from room list or **create** your own room.
 ### In game
 You can move by using `arrow keys` and plant a bomb by using `spacebar`.
 
+#### Player
+
+<div align="center">
+  <img src='https://github.com/wzarek/bomberman/blob/master/client/src/static/img/player.png?raw=true' alt='player'/>
+ </div>
+ 
+ As a player, you initially have only 3 lives. You need to be careful with them. Any contact with an explosion will remove one life from you. On right panel (_playerlist_) you can check how many lives do you - or other players - have.
+
+#### Bomb
+
+<div align="center">
+  <img src='https://github.com/wzarek/bomberman/blob/master/client/src/static/img/bomb.png?raw=true' alt='bomb'/>
+ </div>
+ 
+ Soo, this is a bomb. You know what it does, right? After planting you have 3 seconds to run away from it. Otherwise one of your remaining lives will be taken.
+ 
+#### Blocks
 There are two types of blocks:
 
 <div align="center">
@@ -56,3 +73,7 @@ There are two types of blocks:
     <b>Bonus block</b> - <i>breakable</i> - After you break it there is a 40% chance that it's <i>empty</i>, 30% chance for <i>speed boost</i> and also 30% chance for <i>cooldown reduction</i>.
   </p>
 </div>
+
+#### Bonuses
+
+We can't tell you much about bonuses yet. For now all you need to know that one of them is increasing your speed by 0.5 and the other one decreasing your bomb cooldown by 0.5s.
