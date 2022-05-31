@@ -2,7 +2,9 @@
 
 :root {
     --bg-color: rgb(22,22,22);
-    --game-bg-color: rgb(73,73,73);
+    --secondary-color: rgb(41, 41, 41);
+    --game-bg-color: rgb(73, 73, 73);
+    --accent-color: #5e1819;
     --default-font-color: rgb(255,255,255);
     --default-font : 'Inconsolata', monospace;
 }
@@ -11,6 +13,63 @@ body {
     background-color: var(--bg-color);
     color: var(--default-font-color);
     font-family: var(--default-font);
+}
+
+/* -- USERNAME FORM -- */
+
+main#username-set {
+    height: 80vh;
+}
+
+main#username-set h1 {
+    padding: 2rem 3rem 1rem;
+}
+
+main#username-set p {
+    padding: 1rem 3rem;
+}
+
+.username-set-form {
+    width: 10vw;
+    margin-inline: auto;
+    margin-top: 3rem;
+    padding: 2em;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    border: 5px solid black;
+    border-radius: 1em;
+    background-color: var(--secondary-color);
+}
+
+.username-set-form-error {
+    font-size: .8em;
+    color: rgb(211, 72, 72);
+}
+
+.username-set-form input {
+    border-radius: .5em;
+    border: none;
+    padding: .25em;
+}
+
+.username-set-form button {
+    all: unset;
+    width: 80%;
+    text-align: center;
+    background-color: var(--accent-color);
+    padding: .25em;
+    border-radius: .5em;
+    cursor: pointer;
+    margin-inline: auto;
+}
+
+.username-set-form button:focus {
+    outline: 1px solid white;
+}
+
+.username-set-form button:hover {
+    filter: hue-rotate(30deg) brightness(120%) contrast(200%);
 }
 
 /* -- GAME DASHBOARD --  */
@@ -29,7 +88,7 @@ body {
     gap: 1em;
 }
 
-/* GAME CONTAINER */
+/* -- GAME CONTAINER -- */
 
 .game {
     display: flex;

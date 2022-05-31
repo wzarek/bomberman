@@ -7,21 +7,29 @@ import { AuthContext, AuthProvider } from './components/AuthProvider'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import './static/css/style.css'
 import Game from './components/Game'
+import Loading from './components/Loading'
 
+interface LoadingValues {
+  loading: boolean
+}
 
 function App() {
-  const { loading } = useContext(AuthContext)
+  const { loading } = useContext(AuthContext) as LoadingValues
 
   return (
-    <Routes>
-      <Route path='/' element={<UsernameForm />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path='/dashboard' element={<Dashboard />} />
-      </Route>
-      <Route path='/room/:name' element={<Room />} />
-      <Route path='/game/:id' element={<Game />} />
-      <Route path='*' />
-    </Routes>
+    <>
+      {loading ? <Loading /> :
+        <Routes>
+          <Route path='/' element={<UsernameForm />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path='/dashboard' element={<Dashboard />} />
+          </Route>
+          <Route path='/room/:name' element={<Room />} />
+          <Route path='/game/:id' element={<Game />} />
+          <Route path='*' />
+        </Routes>
+      }
+    </>
   )
 }
 
