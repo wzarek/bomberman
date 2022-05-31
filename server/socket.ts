@@ -98,7 +98,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                     let playerSocket = io.sockets.sockets.get(player)
                     if (playerSocket?.data?.ready == true) readyCount++
                 }
-                if (readyCount == 1) io.in(room).emit('start-game')
+                if (readyCount == 2) io.in(room).emit('start-game')
                 // TODO - pobieranie ilosci wymaganych graczy z ilosci graczy w roomie(z lobby, z sesji) zamiast sztywnej wartosci
             }
         })
@@ -112,12 +112,16 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             // czyli wtedy nie tworzymy modelu z CurrentUser, a kazdy inny obecny w grze(pierwsze X graczy z roomu, gdzie X - ilosc ludzi, ktorzy dolaczyli do gry z Lobby)
         })
 
-        socket.on('player-moved', (position: object) => {
+        socket.on('player-moved', (position: { [name: string]: string }) => {
             socket.to(currentRoom).emit('move-player', socket.id, position)
             socket.data.lastPosition = position
         })
 
-        socket.on('player-bombed', () => {
+        socket.on('player-bombed', (position: { [name: string]: string }, color: string) => {
+            socket.to(currentRoom).emit('spawn-bomb', position, color)
+            // TODO - co zrobic, zeby kazdemu zespawnowaly sie te same bonusy?
+            // moze do BombModel dodac macierz gry + w macierzy przy dodawaniu elementow nadac im data-matrix="[i,j]" albo cos takiego
+            // i dodac w BombModel currentPlayer albo handleCollisions - jesli true to ogarniamy na modelu kolizje flames z bonus, po generowaniu bonusu emit z data-matrix i jaki bonus
             console.log(`${socket.id} bombed`)
         })
 

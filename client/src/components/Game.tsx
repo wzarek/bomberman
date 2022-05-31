@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
+import BombModel from '../models/BombModel'
 import GameModel from '../models/GameModel'
 import PlayerModel from '../models/PlayerModel'
 
@@ -65,6 +66,10 @@ const Game = () => {
             // TODO - odebranie 'ilosci' przesuniec wraz ze speedem playera
             let playerToMove = game.getPlayerById(id)
             playerToMove?.setPlayerPosition(position)
+        })
+
+        socket.on('spawn-bomb', (position: { [name: string]: string }, color: string) => {
+            new BombModel(game, position, color)
         })
 
         // PLAYER NOT IN CURRENT GAME

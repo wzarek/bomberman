@@ -100,7 +100,6 @@ class PlayerModel {
     }
 
     private updatePosition() {
-        // TODO - wysłanie movement.left i movement.top wraz ze speedem playera
         this.socket.emit('player-moved', { top: this.playerElement.style.top, left: this.playerElement.style.left })
     }
 
@@ -138,28 +137,24 @@ class PlayerModel {
                 if (this.canMove('left')) {
                     let leftPosition = window.getComputedStyle(this.playerElement).getPropertyValue('left')
                     this.playerElement.style.left = `calc(${leftPosition} - ${this.playerSpeed * 0.25}vw)`
-                    this.movement.left--
                 }
                 break
             case 'right':
                 if (this.canMove('right')) {
                     let leftPosition = window.getComputedStyle(this.playerElement).getPropertyValue('left')
                     this.playerElement.style.left = `calc(${leftPosition} + ${this.playerSpeed * 0.25}vw)`
-                    this.movement.left++
                 }
                 break
             case 'up':
                 if (this.canMove('up')) {
                     let topPosition = window.getComputedStyle(this.playerElement).getPropertyValue('top')
                     this.playerElement.style.top = `calc(${topPosition} - ${this.playerSpeed * 0.25}vw)`
-                    this.movement.top--
                 }
                 break
             case 'down':
                 if (this.canMove('down')) {
                     let topPosition = window.getComputedStyle(this.playerElement).getPropertyValue('top')
                     this.playerElement.style.top = `calc(${topPosition} + ${this.playerSpeed * 0.25}vw)`
-                    this.movement.top++
                 }
                 break
         }
@@ -169,6 +164,8 @@ class PlayerModel {
 
     private putBomb(position: { [name: string]: string }) {
         let bomb = new BombModel(this.gameModel, position, this.color)
+
+        this.socket.emit('player-bombed', position, this.color)
     }
 
     private tryBomb() {
