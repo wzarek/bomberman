@@ -72,6 +72,11 @@ const Game = () => {
             new BombModel(game, position, color)
         })
 
+        socket.on('remove-life', (id: string) => {
+            let player = game.getPlayerById(id)
+            player?.removeLife()
+        })
+
         // PLAYER NOT IN CURRENT GAME
 
         socket.on('max-players-reached', () => {

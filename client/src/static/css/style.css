@@ -35,6 +35,7 @@ body {
     display: flex;
     justify-content: space-evenly;
     padding: 3em;
+    flex-wrap: wrap;
 }
 
 #game-container {
@@ -49,8 +50,6 @@ body {
     grid-template-columns: repeat(var(--grid-width), 1fr);
     grid-template-rows: repeat(var(--grid-height), 1fr);
     outline: 5px solid black;
-    border-radius: 1em;
-    overflow: hidden;
 }
 
 /* blocks */
@@ -167,10 +166,12 @@ body {
     justify-content:  space-between;
     align-items: center;
     margin-top: 2em;
+    order: 2;
 }
 
 .playerlist-player.current {
     color: red;
+    order: 1;
 }
 
 .playerlist-image {
@@ -181,6 +182,14 @@ body {
     background-size: 100%;
 }
 
-.playerlist-name {
-    /* */
+.playerlist-player.dead, .playerlist-player.current.dead {
+    order: 3;
+}
+
+.playerlist-player.dead .playerlist-name {
+    text-decoration: line-through;
+}
+
+.playerlist-player.dead .playerlist-image {
+    filter: saturate(0);
 }

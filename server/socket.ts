@@ -121,11 +121,12 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             socket.to(currentRoom).emit('spawn-bomb', position, color)
             // TODO - co zrobic, zeby kazdemu zespawnowaly sie te same bonusy?
             // moze do BombModel dodac macierz gry + w macierzy przy dodawaniu elementow nadac im data-matrix="[i,j]" albo cos takiego
-            // i dodac w BombModel currentPlayer albo handleCollisions - jesli true to ogarniamy na modelu kolizje flames z bonus, po generowaniu bonusu emit z data-matrix i jaki bonus
+            // i dodac w BombModel bool currentPlayer albo handleCollisions - jesli true to ogarniamy na modelu kolizje flames z bonus, po generowaniu bonusu emit z data-matrix i jaki bonus
             console.log(`${socket.id} bombed`)
         })
 
         socket.on('player-lost-hp', () => {
+            socket.to(currentRoom).emit('remove-life', socket.id)
             console.log(`${socket.id} lost hp`)
         })
 

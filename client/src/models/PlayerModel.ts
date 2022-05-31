@@ -225,14 +225,17 @@ class PlayerModel {
             let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
             playerLives.textContent = `Lives: ${this.lives}`
 
+            if (this.currentPlayer) this.socket.emit('player-lost-hp')
+
             if (this.lives <= 0) this.handleDead()
         }
     }
 
     private handleDead() {
+        this.playerInListElement?.classList.add('dead')
         let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
         playerLives.textContent = 'dead'
-        this.playerElement.remove()
+        this.removePlayerModel()
     }
 
     public removePlayerModel() {
