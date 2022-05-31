@@ -10,7 +10,11 @@ const Room = () => {
         socket.on('connect', () => { console.log(socket.connected) })
     }, [])
 
-    return <h1>Room {params.name}</h1>
+    return (
+        <main>
+            <h1>Room {params.name}</h1>
+        </main>
+    )
 }
 
 export default Room
