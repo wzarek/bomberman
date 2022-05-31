@@ -21,12 +21,14 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         socket.data.ready = false
         socket.data.lastPosition = null
         socket.data.reconnectTime = null
+        socket.data.dead = false
 
         // Utworzone zmienne socketowe (socket.data):
         // ready - gotowosc do gry (czy wczytal komponent Game)
         // position - [1, 2, 3, 4] - pozycja gracza (w ktorym rogu ma sie pojawic)
         // lastPosition - ostatnia pozycja gracza
         // reconnectTime - [null, settimeout] - timeout na usuniecie gracza jesli opuscil gre
+        // dead - czy player zyje
 
         socket.on('connect', () => {
             console.log(`Socket: ${socket.id}}`)
@@ -49,8 +51,6 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         })
 
         socket.on('join-room', (room) => {
-
-
             let roomSize = io.sockets.adapter.rooms.get(room)?.size || 0
 
             if (roomSize >= 4) {
@@ -127,10 +127,10 @@ const ioServer = (httpServer: any, corsConfig: object) => {
 
         socket.on('player-lost-hp', () => {
             socket.to(currentRoom).emit('remove-life', socket.id)
-            console.log(`${socket.id} lost hp`)
         })
 
         socket.on('player-dead', () => {
+            socket.data.dead = true
             console.log(`${socket.id} is dead`)
         })
 

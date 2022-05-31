@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import Dashboard from './components/Dashboard'
 import UsernameForm from './components/UsernameForm'
 import Room from './components/Room'
@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import './static/css/style.css'
 import Game from './components/Game'
 import Loading from './components/Loading'
+import Navbar from './components/Navbar'
 
 interface LoadingValues {
   loading: boolean
@@ -15,19 +16,31 @@ interface LoadingValues {
 
 function App() {
   const { loading } = useContext(AuthContext) as LoadingValues
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    if (!loading) {
+      setTimeout(() => {
+        setLoaded(true)
+      }, 500)
+    }
+  }, [loading])
 
   return (
     <>
-      {loading ? <Loading /> :
-        <Routes>
-          <Route path='/' element={<UsernameForm />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path='/dashboard' element={<Dashboard />} />
-          </Route>
-          <Route path='/room/:name' element={<Room />} />
-          <Route path='/game/:id' element={<Game />} />
-          <Route path='*' />
-        </Routes>
+      {!loaded ? <Loading /> :
+        <>
+          <Navbar />
+          <Routes>
+            <Route path='/' element={<UsernameForm />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path='/dashboard' element={<Dashboard />} />
+            </Route>
+            <Route path='/room/:name' element={<Room />} />
+            <Route path='/game/:id' element={<Game />} />
+            <Route path='*' />
+          </Routes>
+        </>
       }
     </>
   )

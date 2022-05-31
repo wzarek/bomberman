@@ -206,11 +206,11 @@ class PlayerModel {
     public removeLife() {
         if (this.damageTimer == null) {
             const animKeframes = [
+                { opacity: 0.25 },
                 { opacity: 0.5 },
-                { opacity: 0.75 },
+                { opacity: 0.25 },
                 { opacity: 0.5 },
-                { opacity: 0.75 },
-                { opacity: 0.5 },
+                { opacity: 0.25 },
                 { opacity: 1 }
             ]
             const animTiming = {

@@ -4,7 +4,8 @@
     --bg-color: rgb(22,22,22);
     --secondary-color: rgb(41, 41, 41);
     --game-bg-color: rgb(73, 73, 73);
-    --accent-color: #5e1819;
+    --accent-color: rgb(94, 24, 25);
+    --active-color: rgb(167, 118, 119);
     --default-font-color: rgb(255,255,255);
     --default-font : 'Inconsolata', monospace;
 }
@@ -13,6 +14,98 @@ body {
     background-color: var(--bg-color);
     color: var(--default-font-color);
     font-family: var(--default-font);
+}
+
+/* -- LOADING -- */
+
+main#loader {
+    width: 80vw;
+    height: 80vh;
+    margin-inline: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading {
+    width: 10vw;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: nowrap;
+    gap: 2em;
+}
+
+.loading img {
+    transform: scale(0.5);
+}
+
+.loading img:first-of-type {
+    animation: scaleImg 0.5s ease-in-out;
+}
+
+.loading img:nth-of-type(2) {
+    animation: scaleImg 0.5s 0.1s ease-in-out;
+}
+
+.loading img:nth-of-type(3) {
+    animation: scaleImg 0.5s 0.2s ease-in-out;
+}
+
+@keyframes scaleImg {
+    0% {
+        transform: scale(0.5)
+    }
+    50% {
+        transform: scale(0.75);
+    }
+    100% {
+        transform: scale(0.5);
+    }
+}
+
+/* -- NAV -- */
+
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 70%;
+    height: 3rem;
+    margin-inline: auto;
+}
+
+nav a {
+    all: unset;
+    cursor: pointer;
+    position: relative;
+}
+
+nav a::after {
+    content: "";
+    width: 0;
+    position: absolute;
+    bottom: -.5rem;
+    left: 0;
+    border-bottom: 1px solid var(--default-font-color);
+    transition: width .5s ease-in-out;
+}
+
+nav a:focus {
+    outline: 1px solid white;
+}
+
+nav a.nav-active {
+    color: var(--active-color);
+}
+
+nav a:hover::after {
+    width: 100%;
+}
+
+nav a h2 {
+    all: unset;
+    font-weight: 700;
+    font-size: 1.75rem;
 }
 
 /* -- USERNAME FORM -- */
@@ -102,13 +195,14 @@ main#username-set p {
     background-color: var(--game-bg-color);
     position: relative;
     margin-inline: auto;
-    max-width: fit-content;
+    width: auto;
     align-items: center;
     justify-content: space-around;
     display: grid;
     grid-template-columns: repeat(var(--grid-width), 1fr);
     grid-template-rows: repeat(var(--grid-height), 1fr);
     outline: 5px solid black;
+    border-radius: 1em;
 }
 
 /* blocks */
@@ -218,6 +312,13 @@ main#username-set p {
     height: 100%;
     padding: 1rem;
     border-radius: 1em;
+    background-color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.game-playerlist h2 {
+    order: 1;
 }
 
 .playerlist-player {
@@ -225,12 +326,13 @@ main#username-set p {
     justify-content:  space-between;
     align-items: center;
     margin-top: 2em;
-    order: 2;
+    order: 3;
+    transition: order 0.5s ease-out;
 }
 
 .playerlist-player.current {
     color: red;
-    order: 1;
+    order: 2;
 }
 
 .playerlist-image {
@@ -242,7 +344,7 @@ main#username-set p {
 }
 
 .playerlist-player.dead, .playerlist-player.current.dead {
-    order: 3;
+    order: 4;
 }
 
 .playerlist-player.dead .playerlist-name {
