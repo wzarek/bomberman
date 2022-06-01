@@ -363,7 +363,8 @@ main#game h1 {
 }
 
 .playerlist-player.current {
-    color: red;
+    color: var(--active-color);
+    font-weight: 700;
     order: 2;
 }
 
@@ -384,5 +385,57 @@ main#game h1 {
 }
 
 .playerlist-player.dead .playerlist-image {
+    filter: saturate(0);
+}
+
+/* cooldowns and bonuses */
+
+.game-player-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 20%;
+    margin-left: 20em;
+}
+
+.bomb-cooldown-container {
+    background-color: var(--secondary-color);
+    padding: .5em;
+    border-radius: 1em;
+    position: relative;
+    width: 2em;
+    height: 2em;
+    overflow: hidden;
+}
+
+.bomb-cooldown-animation {
+    position: absolute;
+    width: .25em;
+    height: 3em;
+    top: calc(50% - 3em);
+    left: calc(50% - .125em);
+    background-color: var(--active-color);
+    transform: rotate(0);
+    transform-origin: bottom;
+    border-radius: 20%;
+    display: none;
+    transition: transform .1s ease-in-out;
+    z-index: 1;
+}
+
+.bomb-cooldown-animation.cooldown-waiting-visible {
+    display: block;
+}
+
+.bomb-cooldown-image {
+    width: 100%;
+    height: 100%;
+    background-image: url("../img/bomb.png");
+    background-position: center;
+    background-size: 100%;
+}
+
+.bomb-cooldown-image.cooldown-wait {
     filter: saturate(0);
 }

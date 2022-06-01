@@ -6,6 +6,8 @@ class PlayerModel {
     private socket: any
     private id: string
     private gameModel: GameModel;
+    private canInteract: boolean = false
+    private gameStarted: boolean = false
 
     private currentPlayer: boolean
     private position: number
@@ -71,6 +73,40 @@ class PlayerModel {
 
         this.listElement.appendChild(playerInList)
         this.playerInListElement = playerInList
+    }
+
+    private appendCooldownsAndBonuses() {
+        const playerCooldownsAndBonuses = document.querySelector('.game-player-info') as HTMLElement
+
+        let playerInfo = document.createElement('p')
+        playerInfo.textContent = 'Your info:'
+        playerCooldownsAndBonuses.appendChild(playerInfo)
+
+        let bombCdElement = document.createElement('div')
+        bombCdElement.classList.add('bomb-cooldown-container')
+        playerCooldownsAndBonuses.appendChild(bombCdElement)
+
+        let bombCdAnimation = document.createElement('div')
+        bombCdAnimation.classList.add('bomb-cooldown-animation')
+        bombCdElement.appendChild(bombCdAnimation)
+
+        let bombCdImage = document.createElement('div')
+        bombCdImage.classList.add('bomb-cooldown-image')
+        bombCdImage.setAttribute('data-color', this.color)
+        bombCdElement.appendChild(bombCdImage)
+
+        let playerSpeedContainer = document.createElement('div')
+        playerSpeedContainer.classList.add('player-speed-container')
+        playerCooldownsAndBonuses.appendChild(playerSpeedContainer)
+
+        let playerSpeedValue = document.createElement('div')
+        playerSpeedValue.classList.add('player-speed-value')
+        playerSpeedContainer.appendChild(playerSpeedValue)
+        playerSpeedValue.textContent = `Speed: ${this.playerSpeed}`
+
+        let playerSpeedImage = document.createElement('div')
+        playerSpeedImage.classList.add('player-speed-image')
+        playerSpeedContainer.appendChild(playerSpeedImage)
     }
 
     private isCollidingWithElement(el1: HTMLElement, el2: HTMLElement, direction: string = '') {
@@ -167,12 +203,36 @@ class PlayerModel {
         if (this.canBomb) {
             let cd = this.bombCooldown
             this.canBomb = false
-            setTimeout(() => { this.canBomb = true }, cd * 1000)
+
+            const cdAnimation = document.querySelector('.bomb-cooldown-animation') as HTMLElement
+            const cdImage = document.querySelector('.bomb-cooldown-image') as HTMLElement
+
+            cdAnimation.classList.add('cooldown-waiting-visible')
+            cdImage.classList.add('cooldown-wait')
+
+            let now = new Date().getTime()
+            let countTo = now + (cd * 1000)
+            let interval = setInterval(() => {
+                now = new Date().getTime()
+                let counter = (countTo - now) / 1000
+                let counterForAnimation = 360 - (counter / cd) * 360
+                cdAnimation.style.transform = `rotate(${counterForAnimation}deg)`
+            }, 100)
+
+            setTimeout(() => {
+                this.canBomb = true
+                clearInterval(interval)
+                cdAnimation.classList.remove('cooldown-waiting-visible')
+                cdImage.classList.remove('cooldown-wait')
+            }, cd * 1000)
+
             this.putBomb({ top: this.playerElement.style.top, left: this.playerElement.style.left })
         }
     }
 
     private handleKeyDown(evt: KeyboardEvent) {
+        if (!this.canInteract) return
+
         evt = evt || window.event
         switch (evt.key) {
             case 'ArrowLeft':
@@ -196,6 +256,12 @@ class PlayerModel {
                 this.tryBomb()
                 break
         }
+    }
+
+    public startGame() {
+        this.canInteract = true
+        this.gameStarted = true
+        if (this.currentPlayer) this.appendCooldownsAndBonuses()
     }
 
     public removeLife() {
@@ -249,6 +315,8 @@ class PlayerModel {
     public increaseSpeed() {
         if (this.playerSpeed >= 2.5) return
         this.playerSpeed += 0.5
+        const playerSpeedValue = document.querySelector('.player-speed-value') as HTMLElement
+        playerSpeedValue.textContent = `Speed: ${this.playerSpeed}`
     }
 
     public decreaseBombCooldown() {
