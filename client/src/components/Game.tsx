@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { io } from 'socket.io-client'
+import BombModel from '../models/BombModel'
 import GameModel from '../models/GameModel'
 import PlayerModel from '../models/PlayerModel'
 
@@ -67,6 +68,23 @@ const Game = () => {
             playerToMove?.setPlayerPosition(position)
         })
 
+        socket.on('spawn-bomb', (position: { [name: string]: string }, color: string) => {
+            new BombModel(game, position, color)
+        })
+
+        socket.on('spawn-bonus', (index: string, bonus: string) => {
+            game.handleBonus(index, bonus)
+        })
+
+        socket.on('remove-life', (id: string) => {
+            let player = game.getPlayerById(id)
+            player?.removeLife()
+        })
+
+        socket.on('game-ended', (id: string) => {
+            game.handleGameEnd(id)
+        })
+
         // PLAYER NOT IN CURRENT GAME
 
         socket.on('max-players-reached', () => {
@@ -75,24 +93,30 @@ const Game = () => {
             // ale za to mozna alert o tym, ze gracz nie nalezy do danego pokoju, wiec nie mozemy go dodac do gry
             // i dwa buttony - 'zostan i ogladaj gre', 'wyszukiwarka gier'
         })
+
+        socket.on('cant-join-game', () => {
+            let game = document.querySelector('.game') as HTMLElement
+            game.innerHTML = "Sorry, you can't join this game :( <a href='/'>return to dashboard</a>"
+        })
     }, [])
 
 
     return (
-        <>
+        <main id='game'>
             <h1>
                 Game: {params.id}
             </h1>
             <div className='game'>
-
-                <div id='game-container'>
+                <div className="game-wrapper">
                     {waiting ? <h2>Waiting for players...</h2> : <></>}
+                    <div id='game-container'>
+                    </div>
                 </div>
                 <div className='game-playerlist'>
                     <h2>Players:</h2>
                 </div>
             </div>
-        </>
+        </main>
     )
 }
 

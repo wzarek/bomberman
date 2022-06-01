@@ -7,6 +7,8 @@ class BombModel {
     private color: string
     private position: { [name: string]: string }
 
+    private fromCurrentPlayer: boolean
+
     private timeToExplode: number // sec
 
     private bombElement: HTMLElement | null = null
@@ -17,10 +19,11 @@ class BombModel {
      * @param position_ is a bomb position(player position when he put a bomb)
      * @optional @param timeToExplode_ is a time value in seconds, after which bomb will explode
      */
-    constructor(gameModel_: GameModel, position_: { [name: string]: string }, color_: string, timeToExplode_: number = 3) {
+    constructor(gameModel_: GameModel, position_: { [name: string]: string }, color_: string, fromCurrentPlayer_: boolean = false, timeToExplode_: number = 3) {
         this.gameModel = gameModel_
         this.position = position_
         this.color = color_
+        this.fromCurrentPlayer = fromCurrentPlayer_
         this.timeToExplode = timeToExplode_
 
         this.spawnBomb()
@@ -80,13 +83,17 @@ class BombModel {
         this.location.appendChild(flames)
         flames.animate(animKeframes, animTiming)
 
-        const flamesInterval = setInterval(() => {
-            this.checkFlamesCollision(flames)
-        }, 10)
+        let flamesInterval: any = null
+
+        if (this.fromCurrentPlayer) {
+            flamesInterval = setInterval(() => {
+                this.checkFlamesCollision(flames)
+            }, 10)
+        }
 
         setTimeout(() => {
             this.removeFlames(flames)
-            clearInterval(flamesInterval)
+            flamesInterval && clearInterval(flamesInterval)
         }, 1000)
 
     }

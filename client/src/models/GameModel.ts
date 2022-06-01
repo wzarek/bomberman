@@ -4,6 +4,8 @@ class GameModel {
     private width: number
     private height: number
     private gameContainer: HTMLElement
+    private gameWrapper: HTMLElement = document.querySelector('.game-wrapper') as HTMLElement
+    private playerList: HTMLElement = document.querySelector('.game-playerlist') as HTMLElement
 
     private gameStarted: boolean = false;
 
@@ -40,21 +42,6 @@ class GameModel {
             (elVal1.left >= elVal2.right))
     }
 
-    private getRandomBlock() {
-        let num = Math.random()
-        if (num < 0.75) return 'empty' //probability 0.75
-        else if (num < 0.95) return 'wall' // probability 0.2
-        else return 'bonus' //probability 0.05
-    }
-
-    private generateMatrix() {
-        for (let i = 1; i < this.height - 1; i++) {
-            for (let j = 1; j < this.width - 1; j++) {
-                this.tempMatrix[i][j] = this.getRandomBlock()
-            }
-        }
-    }
-
     private setBlocks() {
         this.gameContainer.style.setProperty('--grid-width', this.width.toString())
         this.gameContainer.style.setProperty('--grid-height', this.height.toString())
@@ -65,6 +52,13 @@ class GameModel {
                 gameBlock.classList.add(this.tempMatrix[i][j])
                 this.gameContainer.append(gameBlock)
                 this.gameMatrix[i][j] = gameBlock
+
+                gameBlock.setAttribute('data-index', `[${i}, ${j}]`)
+
+                if (i === 0 && j === 0) gameBlock.style.borderTopLeftRadius = '1em'
+                else if (i === 0 && j === this.width - 1) gameBlock.style.borderTopRightRadius = '1em'
+                else if (i === this.height - 1 && j === 0) gameBlock.style.borderBottomLeftRadius = '1em'
+                else if (i === this.height - 1 && j === this.width - 1) gameBlock.style.borderBottomRightRadius = '1em'
             }
         }
     }
@@ -76,22 +70,26 @@ class GameModel {
             this.gameContainer.append(currentPlayer)
             switch (player.getPlayerStartingPosition()) {
                 case 1:
-                    currentPlayer.style.top = '.5em' // top left
+                    // top left
+                    currentPlayer.style.top = '.5em'
                     currentPlayer.style.left = '.5em'
                     player.setPlayerColor('blue')
                     break
                 case 2:
-                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom right
+                    // bottom right
+                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)`
                     currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
                     player.setPlayerColor('gold')
                     break
                 case 3:
-                    currentPlayer.style.top = '.5em' // top right
+                    // top right
+                    currentPlayer.style.top = '.5em'
                     currentPlayer.style.left = `calc(100% - ${playerSize} - .5em)`
                     player.setPlayerColor('green')
                     break
                 case 4:
-                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)` // bottom left
+                    // bottom left
+                    currentPlayer.style.top = `calc(100% - ${playerSize} - .5em)`
                     currentPlayer.style.left = '.5em'
                     player.setPlayerColor('red')
                     break
@@ -129,7 +127,7 @@ class GameModel {
     }
 
     private startListeningToPlayerMoves() {
-        setInterval(() => this.getPlayerPosition(), 100)
+        setInterval(() => this.getPlayerPosition(), 100) // FOR DEBUGGING
     }
 
     private generateBonus() {
@@ -140,9 +138,10 @@ class GameModel {
         else return 'cooldown-reduction' //probability 0.3
     }
 
-    public handleBonus(el: HTMLElement) {
+    public handleBonus(el: HTMLElement | string, bonus?: string) {
+        if (typeof (el) === 'string') el = document.querySelector(`[data-index='${el}']`) as HTMLElement
         el.classList.remove('bonus')
-        let bonusType = this.generateBonus()
+        let bonusType = bonus || this.generateBonus()
         if (bonusType === 'empty') return
 
         let bonusElement = document.createElement('div')
@@ -157,6 +156,8 @@ class GameModel {
                 break;
         }
         el.appendChild(bonusElement)
+
+        if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
     }
 
     public initializeGame() {
@@ -192,6 +193,14 @@ class GameModel {
             if (value.getPlayerId() == id) value.handleRemovePlayer()
             return value.getPlayerId() != id
         })
+    }
+
+    public handleGameEnd(id: string) {
+        let winner = this.getPlayerById(id)
+        if (winner?.isCurrent()) alert(`You won! Game ended.`)
+        else alert(`Player ${id} won! Game ended.`)
+        this.gameWrapper.innerHTML = '<p>Game ended :( <a href="/">return to dashboard</a></p>'
+        this.playerList?.remove()
     }
 }
 

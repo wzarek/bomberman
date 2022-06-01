@@ -9,7 +9,7 @@ interface AuthContextInterface {
 
 const AuthContext = createContext<AuthContextInterface | any>(null)
 
-const AuthProvider = ( { children }: any) => {
+const AuthProvider = ({ children }: any) => {
     const [user, setUser] = useState({ hasUsername: false })
     const [loading, setLoading] = useState<boolean>(true)
     const navigate = useNavigate()
@@ -21,10 +21,10 @@ const AuthProvider = ( { children }: any) => {
             const data = await response.json()
 
             if (data && data?.username) {
-                setUser( { ...data } )
-                setLoading(false)
+                setUser({ ...data })
                 if (location.pathname === '/') navigate('/dashboard')
             }
+            setLoading(false)
         }
 
         fetchData()
@@ -32,7 +32,7 @@ const AuthProvider = ( { children }: any) => {
 
     return (
         <AuthContext.Provider value={{ user, setUser, loading }}>
-            { children }
+            {children}
         </AuthContext.Provider>
     )
 }

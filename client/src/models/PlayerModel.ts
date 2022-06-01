@@ -94,13 +94,7 @@ class PlayerModel {
         }
     }
 
-    private pixelsToEms(value: number) {
-        let defaultFontSize = 16
-        return value / defaultFontSize
-    }
-
     private updatePosition() {
-        // TODO - wysłanie movement.left i movement.top wraz ze speedem playera
         this.socket.emit('player-moved', { top: this.playerElement.style.top, left: this.playerElement.style.left })
     }
 
@@ -138,28 +132,24 @@ class PlayerModel {
                 if (this.canMove('left')) {
                     let leftPosition = window.getComputedStyle(this.playerElement).getPropertyValue('left')
                     this.playerElement.style.left = `calc(${leftPosition} - ${this.playerSpeed * 0.25}vw)`
-                    this.movement.left--
                 }
                 break
             case 'right':
                 if (this.canMove('right')) {
                     let leftPosition = window.getComputedStyle(this.playerElement).getPropertyValue('left')
                     this.playerElement.style.left = `calc(${leftPosition} + ${this.playerSpeed * 0.25}vw)`
-                    this.movement.left++
                 }
                 break
             case 'up':
                 if (this.canMove('up')) {
                     let topPosition = window.getComputedStyle(this.playerElement).getPropertyValue('top')
                     this.playerElement.style.top = `calc(${topPosition} - ${this.playerSpeed * 0.25}vw)`
-                    this.movement.top--
                 }
                 break
             case 'down':
                 if (this.canMove('down')) {
                     let topPosition = window.getComputedStyle(this.playerElement).getPropertyValue('top')
                     this.playerElement.style.top = `calc(${topPosition} + ${this.playerSpeed * 0.25}vw)`
-                    this.movement.top++
                 }
                 break
         }
@@ -168,7 +158,9 @@ class PlayerModel {
     }
 
     private putBomb(position: { [name: string]: string }) {
-        let bomb = new BombModel(this.gameModel, position, this.color)
+        let bomb = new BombModel(this.gameModel, position, this.color, this.currentPlayer)
+
+        this.socket.emit('player-bombed', position, this.color)
     }
 
     private tryBomb() {
@@ -209,11 +201,11 @@ class PlayerModel {
     public removeLife() {
         if (this.damageTimer == null) {
             const animKeframes = [
+                { opacity: 0.25 },
                 { opacity: 0.5 },
-                { opacity: 0.75 },
+                { opacity: 0.25 },
                 { opacity: 0.5 },
-                { opacity: 0.75 },
-                { opacity: 0.5 },
+                { opacity: 0.25 },
                 { opacity: 1 }
             ]
             const animTiming = {
@@ -228,14 +220,18 @@ class PlayerModel {
             let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
             playerLives.textContent = `Lives: ${this.lives}`
 
+            if (this.currentPlayer) this.socket.emit('player-lost-hp')
+
             if (this.lives <= 0) this.handleDead()
         }
     }
 
     private handleDead() {
+        this.playerInListElement?.classList.add('dead')
         let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
         playerLives.textContent = 'dead'
-        this.playerElement.remove()
+        this.removePlayerModel()
+        if (this.currentPlayer) this.socket.emit('player-dead')
     }
 
     public removePlayerModel() {
@@ -288,6 +284,11 @@ class PlayerModel {
 
     public isCurrent() {
         return this.currentPlayer
+    }
+
+    public emitBonus(el: HTMLElement, bonus: string) {
+        let index = el.getAttribute('data-index')
+        this.socket.emit('player-bonus', index, bonus)
     }
 
     public handleRemovePlayer() {
