@@ -359,6 +359,10 @@ class PlayerModel {
         this.socket.emit('player-bonus', index, bonus)
     }
 
+    public emitBonusCollision(index: string) {
+        this.socket.emit('player-got-bonus', index)
+    }
+
     public handleRemovePlayer() {
         let playerInfo = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
         playerInfo.textContent = 'disconnected'

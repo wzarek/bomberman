@@ -147,8 +147,10 @@ const ioServer = (httpServer: any, corsConfig: object) => {
 
         socket.on('player-bonus', (index: string, bonus: string) => {
             socket.to(currentRoom).emit('spawn-bonus', index, bonus)
-            // TODO - spawn bonusu nie dziala jak jest empty
-            // TODO - zbieranie bonusow przez playera, zeby znikaly tez u innych
+        })
+
+        socket.on('player-got-bonus', (index: string) => {
+            socket.to(currentRoom).emit('remove-bonus', index)
         })
 
         socket.on('player-lost-hp', () => {
