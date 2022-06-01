@@ -116,6 +116,7 @@ const Game = () => {
                     <h2>Players:</h2>
                 </div>
             </div>
+            <div className='game-player-info'></div>
         </main>
     )
 }

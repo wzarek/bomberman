@@ -138,6 +138,12 @@ class GameModel {
         else return 'cooldown-reduction' //probability 0.3
     }
 
+    private sendStartInfoToPlayers() {
+        for (let player of this.players) {
+            player.startGame()
+        }
+    }
+
     public handleBonus(el: HTMLElement | string, bonus?: string) {
         if (typeof (el) === 'string') el = document.querySelector(`[data-index='${el}']`) as HTMLElement
         el.classList.remove('bonus')
@@ -165,9 +171,9 @@ class GameModel {
     public initializeGame() {
         if (this.gameStarted) return
 
-        // this.generateMatrix()
         this.setBlocks()
         this.spawnPlayers()
+        this.sendStartInfoToPlayers()
         this.startListeningToPlayerMoves()
 
         this.gameStarted = true
