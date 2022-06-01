@@ -53,7 +53,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         })
 
         socket.on('join-room', (room) => {
-            if (matrixMap.has(`${room}-ended`) || matrixMap.has(`${room}-started`)) {
+            if (matrixMap.has(`${room}-started`)) {
                 socket.emit('cant-join-game')
                 socket.data.inGame = false
             }
@@ -174,14 +174,12 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                 }
                 if (deadCount === playersCount - 1) {
                     io.in(currentRoom).emit('game-ended', wonId)
-                    matrixMap.set(`${currentRoom}-ended`, true)
                     for (let player of players) {
                         let playerSocket = io.sockets.sockets.get(player)
                         playerSocket?.leave(currentRoom)
                     }
 
                     matrixMap.delete(currentRoom)
-                    matrixMap.delete(`${currentRoom}-ended`)
                     matrixMap.delete(`${currentRoom}-started`)
                 }
             }
@@ -193,7 +191,10 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             console.log(`Socket disconnect: ${socket.id}`)
             if (currentRoom) socket.to(currentRoom).emit('player-left', socket.id)
             let players = io.sockets.adapter.rooms.get(currentRoom);
-            if (players?.size == 0 || !players) matrixMap.delete(currentRoom)
+            if (players?.size == 0 || !players) {
+                matrixMap.delete(currentRoom)
+                matrixMap.delete(`${currentRoom}-started`)
+            }
             socket.removeAllListeners()
         })
 
