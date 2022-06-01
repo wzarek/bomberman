@@ -142,6 +142,9 @@ class GameModel {
         if (typeof (el) === 'string') el = document.querySelector(`[data-index='${el}']`) as HTMLElement
         el.classList.remove('bonus')
         let bonusType = bonus || this.generateBonus()
+
+        if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
+
         if (bonusType === 'empty') return
 
         let bonusElement = document.createElement('div')
@@ -157,7 +160,6 @@ class GameModel {
         }
         el.appendChild(bonusElement)
 
-        if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
     }
 
     public initializeGame() {

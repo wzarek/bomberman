@@ -54,7 +54,7 @@ const UsernameForm = () => {
                     <Form className='username-set-form'>
                         <label htmlFor="username">username</label>
                         <Field type="text" name='username' id='username' />
-                        {formik.touched.username && (<span className='username-set-form-error'> {formik.errors.username} </span>)}
+                        {formik.touched.username && formik.errors.username && (<span className='username-set-form-error'> {formik.errors.username} </span>)}
                         <button type='submit' disabled={formik.isSubmitting}>submit</button>
                     </Form>
                 )}
