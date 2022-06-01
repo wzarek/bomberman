@@ -4,6 +4,8 @@ class GameModel {
     private width: number
     private height: number
     private gameContainer: HTMLElement
+    private gameWrapper: HTMLElement = document.querySelector('.game-wrapper') as HTMLElement
+    private playerList: HTMLElement = document.querySelector('.game-playerlist') as HTMLElement
 
     private gameStarted: boolean = false;
 
@@ -50,6 +52,8 @@ class GameModel {
                 gameBlock.classList.add(this.tempMatrix[i][j])
                 this.gameContainer.append(gameBlock)
                 this.gameMatrix[i][j] = gameBlock
+
+                gameBlock.setAttribute('data-index', `[${i}, ${j}]`)
 
                 if (i === 0 && j === 0) gameBlock.style.borderTopLeftRadius = '1em'
                 else if (i === 0 && j === this.width - 1) gameBlock.style.borderTopRightRadius = '1em'
@@ -134,9 +138,10 @@ class GameModel {
         else return 'cooldown-reduction' //probability 0.3
     }
 
-    public handleBonus(el: HTMLElement) {
+    public handleBonus(el: HTMLElement | string, bonus?: string) {
+        if (typeof (el) === 'string') el = document.querySelector(`[data-index='${el}']`) as HTMLElement
         el.classList.remove('bonus')
-        let bonusType = this.generateBonus()
+        let bonusType = bonus || this.generateBonus()
         if (bonusType === 'empty') return
 
         let bonusElement = document.createElement('div')
@@ -151,6 +156,8 @@ class GameModel {
                 break;
         }
         el.appendChild(bonusElement)
+
+        if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
     }
 
     public initializeGame() {
@@ -186,6 +193,14 @@ class GameModel {
             if (value.getPlayerId() == id) value.handleRemovePlayer()
             return value.getPlayerId() != id
         })
+    }
+
+    public handleGameEnd(id: string) {
+        let winner = this.getPlayerById(id)
+        if (winner?.isCurrent()) alert(`You won! Game ended.`)
+        else alert(`Player ${id} won! Game ended.`)
+        this.gameWrapper.innerHTML = '<p>Game ended :( <a href="/">return to dashboard</a></p>'
+        this.playerList?.remove()
     }
 }
 

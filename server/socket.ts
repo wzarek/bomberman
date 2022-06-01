@@ -22,6 +22,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         socket.data.lastPosition = null
         socket.data.reconnectTime = null
         socket.data.dead = false
+        socket.data.inGame = false
 
         // Utworzone zmienne socketowe (socket.data):
         // ready - gotowosc do gry (czy wczytal komponent Game)
@@ -29,6 +30,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         // lastPosition - ostatnia pozycja gracza
         // reconnectTime - [null, settimeout] - timeout na usuniecie gracza jesli opuscil gre
         // dead - czy player zyje
+        // inGame - czy to player z obecnej gry
 
         socket.on('connect', () => {
             console.log(`Socket: ${socket.id}}`)
@@ -51,12 +53,19 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         })
 
         socket.on('join-room', (room) => {
+            if (matrixMap.has(`${room}-ended`) || matrixMap.has(`${room}-started`)) {
+                socket.emit('cant-join-game')
+                socket.data.inGame = false
+            }
+
             let roomSize = io.sockets.adapter.rooms.get(room)?.size || 0
 
             if (roomSize >= 4) {
                 // TODO - zrobienie to bardziej pod ilosc graczy z lobby, zeby nikt potem nie dolaczyl, a nie na max ilosc, to ustawic w lobby
                 socket.emit('max-players-reached')
             } else {
+                socket.data.inGame = true
+
                 let playersInRoom = io.sockets.adapter.rooms.get(room) as Set<string>
                 let playersArray = Array.from(playersInRoom?.values() || []).map((player) => {
                     if (player != socket.id) {
@@ -87,6 +96,8 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         // GAME START
 
         socket.on('player-ready', (room) => {
+            if (!socket.data.inGame) return
+
             console.log(`${socket.id} is ready`)
             socket.data.ready = true
             socket.to(room).emit('player-joined', socket.id, socket?.data?.position)
@@ -98,12 +109,17 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                     let playerSocket = io.sockets.sockets.get(player)
                     if (playerSocket?.data?.ready == true) readyCount++
                 }
-                if (readyCount == 2) io.in(room).emit('start-game')
+                if (readyCount == 2) {
+                    io.in(room).emit('start-game')
+                    matrixMap.set(`${room}-started`, true)
+                }
                 // TODO - pobieranie ilosci wymaganych graczy z ilosci graczy w roomie(z lobby, z sesji) zamiast sztywnej wartosci
             }
         })
 
         socket.on('player-disconnect', (room) => {
+            if (!socket.data.inGame) return
+
             socket.to(room).emit('player-left', socket.id)
             // DONE - jesli gra sie rozpoczela, a player wyszedl to usuwamy go z mapy
             // TODO - jesli player sie zreconnectuje(musimy sprawdzic po connect czy gra sie rozpoczela) 
@@ -113,11 +129,15 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         })
 
         socket.on('player-moved', (position: { [name: string]: string }) => {
+            if (!socket.data.inGame) return
+
             socket.to(currentRoom).emit('move-player', socket.id, position)
             socket.data.lastPosition = position
         })
 
         socket.on('player-bombed', (position: { [name: string]: string }, color: string) => {
+            if (!socket.data.inGame) return
+
             socket.to(currentRoom).emit('spawn-bomb', position, color)
             // TODO - co zrobic, zeby kazdemu zespawnowaly sie te same bonusy?
             // moze do BombModel dodac macierz gry + w macierzy przy dodawaniu elementow nadac im data-matrix="[i,j]" albo cos takiego
@@ -125,13 +145,46 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             console.log(`${socket.id} bombed`)
         })
 
+        socket.on('player-bonus', (index: string, bonus: string) => {
+            socket.to(currentRoom).emit('spawn-bonus', index, bonus)
+            // TODO - spawn bonusu nie dziala jak jest empty
+            // TODO - zbieranie bonusow przez playera, zeby znikaly tez u innych
+        })
+
         socket.on('player-lost-hp', () => {
+            if (!socket.data.inGame) return
+
             socket.to(currentRoom).emit('remove-life', socket.id)
         })
 
         socket.on('player-dead', () => {
+            if (!socket.data.inGame) return
+
             socket.data.dead = true
             console.log(`${socket.id} is dead`)
+            let players = io.sockets.adapter.rooms.get(currentRoom);
+            let playersCount = players?.size || 0
+            if (players) {
+                let deadCount = 0
+                let wonId
+                for (let player of players) {
+                    let playerSocket = io.sockets.sockets.get(player)
+                    if (playerSocket?.data?.dead == true) deadCount++
+                    else wonId = playerSocket
+                }
+                if (deadCount === playersCount - 1) {
+                    io.in(currentRoom).emit('game-ended', wonId)
+                    matrixMap.set(`${currentRoom}-ended`, true)
+                    for (let player of players) {
+                        let playerSocket = io.sockets.sockets.get(player)
+                        playerSocket?.leave(currentRoom)
+                    }
+
+                    matrixMap.delete(currentRoom)
+                    matrixMap.delete(`${currentRoom}-ended`)
+                    matrixMap.delete(`${currentRoom}-started`)
+                }
+            }
         })
 
         // GAME END

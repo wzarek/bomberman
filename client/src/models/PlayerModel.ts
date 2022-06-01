@@ -94,11 +94,6 @@ class PlayerModel {
         }
     }
 
-    private pixelsToEms(value: number) {
-        let defaultFontSize = 16
-        return value / defaultFontSize
-    }
-
     private updatePosition() {
         this.socket.emit('player-moved', { top: this.playerElement.style.top, left: this.playerElement.style.left })
     }
@@ -163,7 +158,7 @@ class PlayerModel {
     }
 
     private putBomb(position: { [name: string]: string }) {
-        let bomb = new BombModel(this.gameModel, position, this.color)
+        let bomb = new BombModel(this.gameModel, position, this.color, this.currentPlayer)
 
         this.socket.emit('player-bombed', position, this.color)
     }
@@ -236,6 +231,7 @@ class PlayerModel {
         let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
         playerLives.textContent = 'dead'
         this.removePlayerModel()
+        if (this.currentPlayer) this.socket.emit('player-dead')
     }
 
     public removePlayerModel() {
@@ -288,6 +284,11 @@ class PlayerModel {
 
     public isCurrent() {
         return this.currentPlayer
+    }
+
+    public emitBonus(el: HTMLElement, bonus: string) {
+        let index = el.getAttribute('data-index')
+        this.socket.emit('player-bonus', index, bonus)
     }
 
     public handleRemovePlayer() {
