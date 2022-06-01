@@ -76,6 +76,10 @@ const Game = () => {
             game.handleBonus(index, bonus)
         })
 
+        socket.on('remove-bonus', (index: string) => {
+            game.removeBonus(index)
+        })
+
         socket.on('remove-life', (id: string) => {
             let player = game.getPlayerById(id)
             player?.removeLife()

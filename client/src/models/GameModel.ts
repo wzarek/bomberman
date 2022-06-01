@@ -113,7 +113,9 @@ class GameModel {
 
         const bonuses = document.querySelectorAll('.bonus-for-player')
         bonuses.forEach((bonus) => {
+            let bonusIndex = bonus.getAttribute('data-bonus') as string
             if (this.areColliding(pl, bonus as HTMLElement)) {
+                player.emitBonusCollision(bonusIndex)
                 if (bonus.classList.contains('bonus-speed')) {
                     player.increaseSpeed()
                     bonus.remove()
@@ -130,6 +132,12 @@ class GameModel {
         setInterval(() => this.getPlayerPosition(), 100) // FOR DEBUGGING
     }
 
+    private sendStartInfoToPlayers() {
+        for (let player of this.players) {
+            player.startGame()
+        }
+    }
+
     private generateBonus() {
         let num = Math.random()
 
@@ -138,23 +146,18 @@ class GameModel {
         else return 'cooldown-reduction' //probability 0.3
     }
 
-    private sendStartInfoToPlayers() {
-        for (let player of this.players) {
-            player.startGame()
-        }
-    }
-
     public handleBonus(el: HTMLElement | string, bonus?: string) {
         if (typeof (el) === 'string') el = document.querySelector(`[data-index='${el}']`) as HTMLElement
+        let indexAttribute = el.getAttribute('data-index') as string
         el.classList.remove('bonus')
+
         let bonusType = bonus || this.generateBonus()
-
         if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
-
         if (bonusType === 'empty') return
 
         let bonusElement = document.createElement('div')
         bonusElement.classList.add('bonus-for-player')
+        bonusElement.setAttribute('data-bonus', indexAttribute)
 
         switch (bonusType) {
             case 'speed':
@@ -165,7 +168,11 @@ class GameModel {
                 break;
         }
         el.appendChild(bonusElement)
+    }
 
+    public removeBonus(index: string) {
+        let bonusEl = document.querySelector(`[data-bonus='${index}']`) as HTMLElement
+        bonusEl.remove()
     }
 
     public initializeGame() {
