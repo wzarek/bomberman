@@ -12,10 +12,11 @@ import Navbar from './components/Navbar'
 
 interface LoadingValues {
   loading: boolean
+  error: string
 }
 
 function App() {
-  const { loading } = useContext(AuthContext) as LoadingValues
+  const { loading, error } = useContext(AuthContext) as LoadingValues
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
@@ -28,7 +29,7 @@ function App() {
 
   return (
     <>
-      {!loaded ? <Loading /> :
+      {error ? <div className='error'><h1>Something went wrong :(</h1> <span>Error message: {error}</span></div> : !loaded ? <Loading /> :
         <>
           <Navbar />
           <Routes>
