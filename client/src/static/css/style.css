@@ -323,16 +323,20 @@ main#game h1 {
 }
 
 .bonus-for-player {
-    width: 1vw;
-    height: 1vw;
+    width: 1.3em;
+    height: 1.3em;
 }
 
 .bonus-for-player.bonus-speed {
-    background-color: limegreen;
+    background-image: url("../img/bonus-speed.png");
+    background-position: center;
+    background-size: 100%;
 }
 
 .bonus-for-player.bonus-cd {
-    background-color: royalblue;
+    background-image: url("../img/bonus-cooldown.png");
+    background-position: center;
+    background-size: 100%;
 }
 
 /* playerlist */
@@ -399,7 +403,8 @@ main#game h1 {
     margin-left: 20em;
 }
 
-.bomb-cooldown-container {
+.bomb-cooldown-container,
+.player-speed-container {
     background-color: var(--secondary-color);
     padding: .5em;
     border-radius: 1em;
@@ -438,4 +443,23 @@ main#game h1 {
 
 .bomb-cooldown-image.cooldown-wait {
     filter: saturate(0);
+}
+
+.player-speed-image {
+    width: 100%;
+    height: 100%;
+    background-image: url("../img/bonus-speed.png");
+    background-position: center;
+    background-size: 100%;
+    opacity: .25;
+}
+
+.player-speed-value {
+    width: 2rem;
+    position: absolute;
+    text-align: center;
+    font-size: .7rem;
+    top: calc(50% - .7rem);
+    left: calc(50% - 1rem);
+    color: var(--default-font-color);
 }

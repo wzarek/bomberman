@@ -15,6 +15,7 @@ class GameModel {
     private gameMatrix: Array<Array<HTMLElement>>
 
     private bombCooldown: number // sec
+    private playerSpeed: number
 
     /**
      * Generates a Game model
@@ -23,10 +24,11 @@ class GameModel {
      * @param cooldown_ is a time value in seconds, bomb use cooldown for users
      * @param gameContainer_ is a selector for game main container
      */
-    constructor(gameStarted_: boolean = false, players_: { [name: string]: string } = {}, width_: number = 30, height_: number = 15, cooldown_: number = 3, gameContainer_: string = "#game-container") {
+    constructor(gameStarted_: boolean = false, players_: { [name: string]: string } = {}, width_: number = 30, height_: number = 15, cooldown_: number = 3, speed_: number = 1, gameContainer_: string = "#game-container") {
         this.width = width_
         this.height = height_
         this.bombCooldown = cooldown_
+        this.playerSpeed = speed_
         this.gameContainer = document.querySelector(gameContainer_) as HTMLElement // TODO - dla bezpieczenstwa stylizacji(element nie musi miec id game-container) dodajemy data-game='container' i po tym robimy cssa
         this.tempMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill('empty'))
         this.gameMatrix = new Array(height_).fill(0).map(() => new Array(width_).fill(0))
@@ -184,6 +186,14 @@ class GameModel {
         this.startListeningToPlayerMoves()
 
         this.gameStarted = true
+    }
+
+    public getGameSpeed() {
+        return this.playerSpeed
+    }
+
+    public getGameCooldown() {
+        return this.bombCooldown
     }
 
     public getCurrentPlayer() {
