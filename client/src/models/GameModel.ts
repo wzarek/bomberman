@@ -211,9 +211,16 @@ class GameModel {
     }
 
     public handleGameEnd(id: string) {
+        let player = this.getCurrentPlayer()
+        player?.preventInteraction()
+
         let winner = this.getPlayerById(id)
         if (winner?.isCurrent()) alert(`You won! Game ended.`)
         else alert(`Player ${id} won! Game ended.`)
+
+        const playerInfo = document.querySelector('.game-player-info') as HTMLElement
+        playerInfo.remove()
+
         this.gameWrapper.innerHTML = '<p>Game ended :( <a href="/">return to dashboard</a></p>'
         this.playerList?.remove()
     }
