@@ -70,7 +70,7 @@ const corsConfig = {
         });
     },
     cors: {
-        origin: ['*'],
+        origin: ['http://localhost:*', 'https://bomberman.wzarek.me:*'],
         credentials: true
     },
 };
