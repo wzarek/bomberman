@@ -30,7 +30,7 @@ const UsernameForm = () => {
                     actions.resetForm()
 
                     const fetchData = async () => {
-                        const response = await fetch('http://localhost:3000/api/setUsername', {
+                        const response = await fetch('https://bomberman-server.herokuapp.com/api/setUsername', {
                             method: 'POST',
                             credentials: 'include',
                             headers: {

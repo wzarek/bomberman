@@ -16,10 +16,12 @@ const AuthProvider = ({ children }: any) => {
     const navigate = useNavigate()
     const location = useLocation()
 
+    let link = 'https://bomberman-server.herokuapp.com/'
+
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/setUsername', { credentials: 'include' })
+                const response = await fetch(`${link}/api/setUsername`, { credentials: 'include' })
                 const data = await response.json()
 
                 if (data && data?.username) {
