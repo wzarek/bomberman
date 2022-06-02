@@ -36,8 +36,8 @@ function App() {
             <Route path='/' element={<UsernameForm />} />
             <Route element={<ProtectedRoute />}>
               <Route path='/dashboard' element={<Dashboard />} />
+              <Route path='/room/:name' element={<Room />} />
             </Route>
-            <Route path='/room/:name' element={<Room />} />
             <Route path='/game/:id' element={<Game />} />
             <Route path='*' />
           </Routes>
