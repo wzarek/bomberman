@@ -76,9 +76,18 @@ const Game = () => {
             game.handleBonus(index, bonus)
         })
 
+        socket.on('remove-bonus', (index: string) => {
+            game.removeBonus(index)
+        })
+
         socket.on('remove-life', (id: string) => {
             let player = game.getPlayerById(id)
             player?.removeLife()
+        })
+
+        socket.on('pre-game-ended', () => {
+            let player = game.getCurrentPlayer() as PlayerModel
+            if (player?.getPlayerLives() > 0) socket.emit('end-game')
         })
 
         socket.on('game-ended', (id: string) => {
@@ -116,6 +125,7 @@ const Game = () => {
                     <h2>Players:</h2>
                 </div>
             </div>
+            <div className='game-player-info'></div>
         </main>
     )
 }

@@ -113,7 +113,9 @@ class GameModel {
 
         const bonuses = document.querySelectorAll('.bonus-for-player')
         bonuses.forEach((bonus) => {
+            let bonusIndex = bonus.getAttribute('data-bonus') as string
             if (this.areColliding(pl, bonus as HTMLElement)) {
+                player.emitBonusCollision(bonusIndex)
                 if (bonus.classList.contains('bonus-speed')) {
                     player.increaseSpeed()
                     bonus.remove()
@@ -130,6 +132,12 @@ class GameModel {
         setInterval(() => this.getPlayerPosition(), 100) // FOR DEBUGGING
     }
 
+    private sendStartInfoToPlayers() {
+        for (let player of this.players) {
+            player.startGame()
+        }
+    }
+
     private generateBonus() {
         let num = Math.random()
 
@@ -140,12 +148,16 @@ class GameModel {
 
     public handleBonus(el: HTMLElement | string, bonus?: string) {
         if (typeof (el) === 'string') el = document.querySelector(`[data-index='${el}']`) as HTMLElement
+        let indexAttribute = el.getAttribute('data-index') as string
         el.classList.remove('bonus')
+
         let bonusType = bonus || this.generateBonus()
+        if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
         if (bonusType === 'empty') return
 
         let bonusElement = document.createElement('div')
         bonusElement.classList.add('bonus-for-player')
+        bonusElement.setAttribute('data-bonus', indexAttribute)
 
         switch (bonusType) {
             case 'speed':
@@ -156,16 +168,19 @@ class GameModel {
                 break;
         }
         el.appendChild(bonusElement)
+    }
 
-        if (!bonus) this?.getCurrentPlayer()?.emitBonus(el, bonusType)
+    public removeBonus(index: string) {
+        let bonusEl = document.querySelector(`[data-bonus='${index}']`) as HTMLElement
+        bonusEl.remove()
     }
 
     public initializeGame() {
         if (this.gameStarted) return
 
-        // this.generateMatrix()
         this.setBlocks()
         this.spawnPlayers()
+        this.sendStartInfoToPlayers()
         this.startListeningToPlayerMoves()
 
         this.gameStarted = true
@@ -196,9 +211,16 @@ class GameModel {
     }
 
     public handleGameEnd(id: string) {
+        let player = this.getCurrentPlayer()
+        player?.preventInteraction()
+
         let winner = this.getPlayerById(id)
         if (winner?.isCurrent()) alert(`You won! Game ended.`)
         else alert(`Player ${id} won! Game ended.`)
+
+        const playerInfo = document.querySelector('.game-player-info') as HTMLElement
+        playerInfo.remove()
+
         this.gameWrapper.innerHTML = '<p>Game ended :( <a href="/">return to dashboard</a></p>'
         this.playerList?.remove()
     }
