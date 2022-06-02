@@ -85,6 +85,11 @@ const Game = () => {
             player?.removeLife()
         })
 
+        socket.on('pre-game-ended', () => {
+            let player = game.getCurrentPlayer() as PlayerModel
+            if (player?.getPlayerLives() > 0) socket.emit('end-game')
+        })
+
         socket.on('game-ended', (id: string) => {
             game.handleGameEnd(id)
         })

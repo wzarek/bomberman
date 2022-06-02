@@ -164,26 +164,31 @@ const ioServer = (httpServer: any, corsConfig: object) => {
 
             socket.data.dead = true
             console.log(`${socket.id} is dead`)
-            let players = io.sockets.adapter.rooms.get(currentRoom);
+            let players = io.sockets.adapter.rooms.get(currentRoom)
             let playersCount = players?.size || 0
+            let playerSockets = []
             if (players) {
                 let deadCount = 0
-                let wonId
                 for (let player of players) {
                     let playerSocket = io.sockets.sockets.get(player)
+                    playerSockets.push(playerSocket)
                     if (playerSocket?.data?.dead == true) deadCount++
-                    else wonId = playerSocket
                 }
                 if (deadCount === playersCount - 1) {
-                    io.in(currentRoom).emit('game-ended', wonId)
-                    for (let player of players) {
-                        let playerSocket = io.sockets.sockets.get(player)
-                        playerSocket?.leave(currentRoom)
-                    }
-
-                    matrixMap.delete(currentRoom)
+                    let wonId = playerSockets.find((player) => !player?.data?.dead)
+                    io.in(currentRoom).emit('pre-game-ended')
                     matrixMap.delete(`${currentRoom}-started`)
                 }
+            }
+        })
+
+        socket.on('end-game', () => {
+            let players = io.sockets.adapter.rooms.get(currentRoom)
+            io.in(currentRoom).emit('game-ended', socket.id)
+            if (!players) return
+            for (let player of players) {
+                let playerSocket = io.sockets.sockets.get(player)
+                playerSocket?.leave(currentRoom)
             }
         })
 

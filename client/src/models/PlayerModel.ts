@@ -270,10 +270,23 @@ class PlayerModel {
         if (evt.key == ' ') this.tryBomb()
     }
 
+
+    private handleDead() {
+        this.playerInListElement?.classList.add('dead')
+        let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
+        playerLives.textContent = 'dead'
+        this.removePlayerModel()
+        if (this.currentPlayer) this.socket.emit('player-dead')
+    }
+
     public startGame() {
         this.canInteract = true
         this.gameStarted = true
         if (this.currentPlayer) this.appendCooldownsAndBonuses()
+    }
+
+    public preventInteraction() {
+        this.canInteract = false
     }
 
     public removeLife() {
@@ -302,14 +315,6 @@ class PlayerModel {
 
             if (this.lives <= 0) this.handleDead()
         }
-    }
-
-    private handleDead() {
-        this.playerInListElement?.classList.add('dead')
-        let playerLives = this.playerInListElement?.querySelector('.playerlist-lives') as HTMLElement
-        playerLives.textContent = 'dead'
-        this.removePlayerModel()
-        if (this.currentPlayer) this.socket.emit('player-dead')
     }
 
     public removePlayerModel() {
