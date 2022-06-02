@@ -16,14 +16,14 @@ declare module 'express-session' {
     }
 }
 
-declare module "http" {
+declare module 'http' {
     export interface IncomingMessage {
         cookieHolder?: string,
         session: Session & {
             user: { [key: string]: any }
         }
     }
-}
+} export default 'http'
 
 const redisClient = new Redis()
 const RedisStore = connectRedis(session)
