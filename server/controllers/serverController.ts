@@ -5,7 +5,6 @@ import * as path from 'path'
 
 import { Request, Response } from "express";
 import { Session } from 'express-session'
-import { IncomingMessage } from "http";
 
 require('dotenv').config({ path: path.join(__dirname, '../.env') })
 
@@ -18,7 +17,7 @@ declare module 'express-session' {
 }
 
 declare module "http" {
-    interface IncomingMessage {
+    export interface IncomingMessage {
         cookieHolder?: string,
         session: Session & {
             user: { [key: string]: any }

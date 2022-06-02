@@ -5,7 +5,6 @@ import cors from 'cors'
 
 import { router as UsernameRouter } from './routes/UsernameRouter'
 import { sessionMiddleware, corsConfig } from './controllers/serverController'
-import { getRooms } from './controllers/roomController'
 
 require('dotenv').config({ path: __dirname + '/.env'})
 
