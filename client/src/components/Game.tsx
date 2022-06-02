@@ -13,7 +13,7 @@ type Props = {
 const Game = () => {
     const [waiting, setWaiting] = useState(true)
     const params = useParams()
-    const socket = io('http://localhost:3000/')
+    const socket = io('https://bomberman-server.herokuapp.com/')
 
     useEffect(() => {
         let game = new GameModel()

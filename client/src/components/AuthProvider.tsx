@@ -16,7 +16,7 @@ const AuthProvider = ({ children }: any) => {
     const navigate = useNavigate()
     const location = useLocation()
 
-    let link = 'https://bomberman-server.herokuapp.com/'
+    let link = 'https://bomberman-server.herokuapp.com'
 
     useEffect(() => {
         const fetchData = async () => {

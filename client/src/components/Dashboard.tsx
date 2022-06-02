@@ -6,7 +6,7 @@ const Dashboard = () => {
     const [rooms, setRooms] = useState([])
     const navigate = useNavigate()
 
-    const socket = io('http://localhost:3000', {
+    const socket = io('https://bomberman-server.herokuapp.com/', {
         withCredentials: true
     })
 
