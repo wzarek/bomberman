@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client"
 import BombModel from "./BombModel"
 import GameModel from "./GameModel"
 
@@ -267,7 +266,7 @@ class PlayerModel {
         if (!this.canInteract) return
 
         evt = evt || window.event
-        if (evt.key == ' ') this.tryBomb()
+        if (evt.key === ' ') this.tryBomb()
     }
 
 
