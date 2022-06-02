@@ -188,20 +188,116 @@ main#username-set p {
     filter: hue-rotate(30deg) brightness(120%) contrast(200%);
 }
 
-/* -- GAME DASHBOARD --  */
+/* -- CREATE ROOM FORM -- */
 
-.game-dashboard {
-    width: 50vw;
-    margin-inline: auto;
+main#dashboard {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 2em;
 }
 
-.game-dashboard form {
+main#dashboard h1 {
+    width: 100%;
+}
+
+.create-room-form,
+.room-list {
+    width: 30%;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    justify-content: center;
+    align-items: center;
+    height: 30em;
+    background-color: var(--secondary-color);
+    padding: 1em;
+    outline: 5px solid black;
+    border-radius: 2em;
+    position: relative;
+}
+
+.create-room-form h2,
+.room-list h2 {
+    color: var(--active-color);
+    position: absolute;
+    top: 1.5rem;
+    letter-spacing: .125em;
+    font-size: 1.75em;
+}
+
+.create-room-form .create-room-form-input {
+    display: flex;
+    flex-direction: column;
+}
+
+.create-room-form input {
+    border-radius: .5em;
+    border: none;
+    padding: .25em;
+}
+
+.create-room-form label {
+    font-weight: 300;
+    font-size: .9em;
+}
+
+.create-room-form .create-room-form-radio {
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    margin-bottom: .5em;
+}
+
+.create-room-form button {
+    all: unset;
+    width: 80%;
+    text-align: center;
+    background-color: var(--accent-color);
+    margin-top: 2em;
+    padding: .25em;
+    border-radius: .5em;
+    cursor: pointer;
+    margin-inline: auto;
+}
+
+.create-room-form button:focus {
+    outline: 1px solid white;
+}
+
+.create-room-form button:hover {
+    filter: hue-rotate(30deg) brightness(120%) contrast(200%);
+}
+
+.room-list-container {
+    margin-top: 7em;
+    width: 80%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: .25em;
+}
+
+.room-list-single {
+    background-color: black;
+    padding: .5em;
+    cursor: pointer;
+    border-radius: .5em;
+}
+
+.room-list-single:hover {
+    background-color: var(--active-color);
+}
+
+.room-list-single a {
+    padding: 1rem .5rem;
+    color: var(--default-font-color);
+    text-decoration: none;
+}
+
+.room-list-single span {
+    float: right;
+    padding: 0 .5rem;
 }
 
 /* -- GAME CONTAINER -- */
@@ -323,16 +419,20 @@ main#game h1 {
 }
 
 .bonus-for-player {
-    width: 1vw;
-    height: 1vw;
+    width: 1.3em;
+    height: 1.3em;
 }
 
 .bonus-for-player.bonus-speed {
-    background-color: limegreen;
+    background-image: url("../img/bonus-speed.png");
+    background-position: center;
+    background-size: 100%;
 }
 
 .bonus-for-player.bonus-cd {
-    background-color: royalblue;
+    background-image: url("../img/bonus-cooldown.png");
+    background-position: center;
+    background-size: 100%;
 }
 
 /* playerlist */
@@ -399,7 +499,8 @@ main#game h1 {
     margin-left: 20em;
 }
 
-.bomb-cooldown-container {
+.bomb-cooldown-container,
+.player-speed-container {
     background-color: var(--secondary-color);
     padding: .5em;
     border-radius: 1em;
@@ -438,4 +539,23 @@ main#game h1 {
 
 .bomb-cooldown-image.cooldown-wait {
     filter: saturate(0);
+}
+
+.player-speed-image {
+    width: 100%;
+    height: 100%;
+    background-image: url("../img/bonus-speed.png");
+    background-position: center;
+    background-size: 100%;
+    opacity: .25;
+}
+
+.player-speed-value {
+    width: 2rem;
+    position: absolute;
+    text-align: center;
+    font-size: .7rem;
+    top: calc(50% - .7rem);
+    left: calc(50% - 1rem);
+    color: var(--default-font-color);
 }

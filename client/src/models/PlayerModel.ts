@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client"
 import BombModel from "./BombModel"
 import GameModel from "./GameModel"
 
@@ -267,7 +266,7 @@ class PlayerModel {
         if (!this.canInteract) return
 
         evt = evt || window.event
-        if (evt.key == ' ') this.tryBomb()
+        if (evt.key === ' ') this.tryBomb()
     }
 
 
@@ -330,7 +329,7 @@ class PlayerModel {
     }
 
     public increaseSpeed() {
-        if (this.playerSpeed >= 2.5) return
+        if (this.playerSpeed >= this.gameModel.getGameSpeed() + 2) return
         this.playerSpeed += 0.5
         const playerSpeedValue = document.querySelector('.player-speed-value') as HTMLElement
         playerSpeedValue.textContent = `Speed: ${this.playerSpeed}`
