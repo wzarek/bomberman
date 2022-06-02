@@ -10,7 +10,6 @@ class Room {
     constructor(name_ : string, playerID_: string, gameParameters_: {[name: string]: string | number}) {
         this.name = name_
         this.players.push(playerID_)
-        this.playerCounter++
         this.gameParameters = gameParameters_
     }
 
@@ -25,12 +24,12 @@ class Room {
     public addPlayer(socket: Socket) {
         if (this.inGame) return { error: 'Game has started'}
 
-        this.players.push(socket.id)
+        this.players.push(socket.request.session.user.username)
         this.playerCounter++
     }
 
     public removePlayer(socket: Socket) {
-        this.players = this.players.filter((playerID: string) => { playerID !== socket.id })
+        this.players = this.players.filter((playerID: string) => { playerID !== socket.request.session.user.username })
         this.playerCounter--
     }
 

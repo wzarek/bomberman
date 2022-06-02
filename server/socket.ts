@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io'
-import { IncomingMessage } from "http"
+import http from './controllers/serverController'
+import { IncomingMessage } from 'http'
 
 import ServerGameModel from './models/ServerGameModel'
 import Room from './controllers/roomController'
@@ -36,11 +37,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         socket.on('connect', () => {
             console.log(`Socket: ${socket.id}}`)
         })
-
-        socket.on('custom-message', (message: string) => {
-            console.log(message)
-        })
-
+        
         socket.on('create-room-status', (name: string, gameParameters: { [key: string]: string | number }) => {
             const isExisting = listOfRooms.find(r => r.getName() === name ? true : false)
 
@@ -66,16 +63,23 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         })
 
         socket.on('test-join-room', (name: string) => {
+            if (socket.request.session.user.room !== '') socket.leave(socket.request.session.user.room)
+            
+            const room = listOfRooms.find(r => r.getName() === name)
+            room?.addPlayer(socket)
+
+            socket.request.session.user.room = name
             socket.join(name)
         })
 
-        socket.on('leave-room', (name: string, socket: Socket) => {
-            const room = listOfRooms.find(r => r.getName() === name)
-            room?.removePlayer(socket)
-            socket.leave(name)
+        // socket.on('leave-room', (name: string) => {
+        //     const room = listOfRooms.find(r => r.getName() === name)
+        //     room?.removePlayer(socket)
+        //     socket.request.session.user.room = ''
+        //     socket.leave(name)
 
-            if (room?.getNumberOfPlayers() === 0) listOfRooms = listOfRooms.filter(r => r.getName() !== name)
-        })
+        //     if (room?.getNumberOfPlayers() === 0) listOfRooms = listOfRooms.filter(r => r.getName() !== name)
+        // })
 
         socket.on('join-room', (room) => {
             if (matrixMap.has(`${room}-started`)) {
@@ -227,6 +231,19 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                 matrixMap.delete(currentRoom)
                 matrixMap.delete(`${currentRoom}-started`)
             }
+
+            if (socket.request.session?.user && socket.request.session.user.room !== '') {
+                const socketRoom = socket.request.session.user.room
+                const room = listOfRooms.find(r => r.getName() === socketRoom)
+                room?.removePlayer(socket)
+                socket.request.session.user.room = ''
+                socket.leave(socketRoom)
+
+                console.log(room?.getNumberOfPlayers())
+
+                if (room?.getNumberOfPlayers() === 0) listOfRooms = listOfRooms.filter(r => r.getName() !== socketRoom)
+            }
+
             socket.removeAllListeners()
         })
 

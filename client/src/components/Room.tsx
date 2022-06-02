@@ -1,11 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { useParams, useNavigate } from 'react-router-dom'
 
 const Room = () => {
     const params = useParams()
-    const socket = io('http://localhost:3000/')
     const navigate = useNavigate()
+    const socket = io('http://localhost:3000', {
+        withCredentials: true
+    })
 
     useEffect(() => {
         socket.emit('join-room-status', params.name)
