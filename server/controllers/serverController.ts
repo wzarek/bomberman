@@ -25,7 +25,7 @@ declare module "http" {
     }
 }
 
-const redisClient = new Redis()
+const redisClient = new Redis(17218, 'redis-17218.c135.eu-central-1-1.ec2.cloud.redislabs.com', { password: '0rsCU0n98ZftpbfaM7bqDawLixaoJiGI', username: 'default' })
 const RedisStore = connectRedis(session)
 
 const sessionMiddleware = session({
@@ -62,7 +62,7 @@ const corsConfig = {
         });
     },
     cors: {
-        origin: ['http://localhost:8080'],
+        origin: ['*'],
         credentials: true
     },
 }
