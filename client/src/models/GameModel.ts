@@ -215,8 +215,8 @@ class GameModel {
 
     public removePlayer(id: string) {
         this.players = this.players.filter((value: PlayerModel) => {
-            if (value.getPlayerId() == id) value.handleRemovePlayer()
-            return value.getPlayerId() != id
+            if (value.getPlayerId() === id) value.handleRemovePlayer()
+            return value.getPlayerId() !== id
         })
     }
 
