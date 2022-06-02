@@ -1,41 +1,47 @@
 import { Server, Socket } from 'socket.io'
 
-export const getRooms = (io: Server) => {
-    const rooms = Array.from(io.sockets.adapter.rooms).filter((r) => r[0].length <= 16)
+class Room {
+    private name: string
+    private inGame: boolean = false
+    private playerCounter: number = 0
+    private players: Array<string> = []
+    private gameParameters: { [name: string]: string | number }
 
-    return rooms
-}
+    constructor(name_ : string, playerID_: string, gameParameters_: {[name: string]: string | number}) {
+        this.name = name_
+        this.players.push(playerID_)
+        this.playerCounter++
+        this.gameParameters = gameParameters_
+    }
 
-export const inRoom = (socket: Socket) => {
-    if (socket.request.session.user.room.length > 0) return true
+    public getName() {
+        return this.name
+    }
 
-    return false
-} 
+    public getNumberOfPlayers() {
+        return this.playerCounter
+    }
 
-export const createRoom = (io: Server, socket: Socket, name: string) => {
-    const rooms = getRooms(io)
+    public addPlayer(socket: Socket) {
+        if (this.inGame) return { error: 'Game has started'}
 
-    if (rooms.find(e => e[0] === name)) {
-        return { error: 'That room already exists'}
+        this.players.push(socket.id)
+        this.playerCounter++
+    }
+
+    public removePlayer(socket: Socket) {
+        this.players = this.players.filter((playerID: string) => { playerID !== socket.id })
+        this.playerCounter--
+    }
+
+    public setInGame() {
+        this.inGame = true
+    }
+
+    public getInGame() {
+        return this.inGame
     }
 
 }
 
-export const joinRoom = (io: Server, socket: Socket, name: string) => {
-    const usersInRoom = io.sockets.adapter.rooms.get(name).size
-
-    if (usersInRoom === 4) {
-        return { error: "Room is full" }
-    }
-
-    if (inRoom(socket)) {
-        const userRoom = socket.request.session.user.room
-        socket.leave(userRoom)
-    }
-
-}
-
-export const leaveRoom = (socket: Socket, name: string) =>  {
-    socket.leave(name)
-    socket.request.session.user.room = ''
-}
+export default Room 

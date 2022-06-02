@@ -1,20 +1,21 @@
 import { Server, Socket } from 'socket.io'
-import { IncomingMessage } from "http";
+import { IncomingMessage } from "http"
 
-import { getRooms } from './controllers/roomController'
-import ServerGameModel from './models/ServerGameModel';
+import ServerGameModel from './models/ServerGameModel'
+import Room from './controllers/roomController'
 
 const ioServer = (httpServer: any, corsConfig: object) => {
     const io = new Server(httpServer, corsConfig)
 
     io.engine.on("initial_headers", (headers: { [key: string]: string }, req: IncomingMessage) => {
         if (req.cookieHolder) {
-            headers["set-cookie"] = req.cookieHolder;
-            delete req.cookieHolder;
+            headers["set-cookie"] = req.cookieHolder
+            delete req.cookieHolder
         }
-    });
+    })
 
     let matrixMap = new Map() // map for room data (i.e. game matrix)
+    let listOfRooms: Array<Room> = []
 
     io.on("connection", (socket) => {
         let currentRoom: string;
@@ -40,16 +41,40 @@ const ioServer = (httpServer: any, corsConfig: object) => {
             console.log(message)
         })
 
-        socket.on('get-rooms', () => {
+        socket.on('create-room-status', (name: string, gameParameters: { [key: string]: string | number }) => {
+            const isExisting = listOfRooms.find(r => r.getName() === name ? true : false)
 
+            if (isExisting) return socket.emit('send-information', { status: 'ERROR', error: 'That room already exists' })
+
+            const room = new Room(name, socket.request.session.user.username, gameParameters)
+            listOfRooms.push(room)
+
+            return socket.emit('send-information', { status: 'OK', message: 'Successfully created room' })
         })
 
-        socket.on('get-users-in-room', () => {
+        socket.on('join-room-status', (name: string) => {
+            const isExisting = listOfRooms.find(r => r.getName() === name ? true : false)
 
+            if (!isExisting) return socket.emit('send-information', { status: 'ERROR', error: 'Cannot join room that does not exist' })
+
+            const room = listOfRooms.find(r => r.getName() === name)
+
+            if (room?.getNumberOfPlayers() === 4) return socket.emit('send-information', { status: 'ERROR', error: 'Room is full' })
+            if (room?.getInGame()) return socket.emit('send-information', { status: 'ERROR', error: 'The game has already started' })
+
+            return socket.emit('send-information', { status: 'OK', canJoin: true })
         })
 
-        socket.on('create-room', () => {
+        socket.on('test-join-room', (name: string) => {
+            socket.join(name)
+        })
 
+        socket.on('leave-room', (name: string, socket: Socket) => {
+            const room = listOfRooms.find(r => r.getName() === name)
+            room?.removePlayer(socket)
+            socket.leave(name)
+
+            if (room?.getNumberOfPlayers() === 0) listOfRooms = listOfRooms.filter(r => r.getName() !== name)
         })
 
         socket.on('join-room', (room) => {
