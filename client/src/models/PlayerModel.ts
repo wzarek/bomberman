@@ -26,7 +26,7 @@ class PlayerModel {
     private listElement: HTMLElement
     private playerInListElement: HTMLElement | null = null
 
-    private movement: { [name: string]: number } = { left: 0, top: 0 }
+    private keyPressed: { [name: string]: boolean } = {}
 
     constructor(gameModel_: GameModel, id_: string, position_: number, currentPlayer_: boolean = false, socket_: any = null, playerSpeed_: number = 1, lives_: number = 3) {
         this.socket = socket_
@@ -49,6 +49,8 @@ class PlayerModel {
 
         if (currentPlayer_) {
             document.addEventListener('keydown', (evt) => this.handleKeyDown(evt as KeyboardEvent))
+            document.addEventListener('keypress', (evt) => this.handleKeyPress(evt as KeyboardEvent))
+            document.addEventListener('keyup', (evt) => this.handleKeyUp(evt as KeyboardEvent))
         }
     }
 
@@ -230,32 +232,42 @@ class PlayerModel {
         }
     }
 
+    private handleMoving() {
+        if (this.keyPressed['ArrowLeft']) {
+            this.startMoving('left')
+        }
+        if (this.keyPressed['ArrowRight']) {
+            this.startMoving('right')
+        }
+        if (this.keyPressed['ArrowUp']) {
+            this.startMoving('up')
+        }
+        if (this.keyPressed['ArrowDown']) {
+            this.startMoving('down')
+        }
+    }
+
     private handleKeyDown(evt: KeyboardEvent) {
         if (!this.canInteract) return
 
         evt = evt || window.event
-        switch (evt.key) {
-            case 'ArrowLeft':
-                evt.preventDefault()
-                this.startMoving('left')
-                break
-            case 'ArrowRight':
-                evt.preventDefault()
-                this.startMoving('right')
-                break
-            case 'ArrowUp':
-                evt.preventDefault()
-                this.startMoving('up')
-                break
-            case 'ArrowDown':
-                evt.preventDefault()
-                this.startMoving('down')
-                break
-            case ' ':
-                evt.preventDefault()
-                this.tryBomb()
-                break
-        }
+        this.keyPressed[evt.key] = true
+        this.handleMoving()
+    }
+
+    private handleKeyUp(evt: KeyboardEvent) {
+        if (!this.canInteract) return
+
+        evt = evt || window.event
+        delete this.keyPressed[evt.key]
+        this.handleMoving()
+    }
+
+    private handleKeyPress(evt: KeyboardEvent) {
+        if (!this.canInteract) return
+
+        evt = evt || window.event
+        if (evt.key == ' ') this.tryBomb()
     }
 
     public startGame() {
