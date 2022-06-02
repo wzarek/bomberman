@@ -5,6 +5,7 @@ class Room {
     private inGame: boolean = false
     private playerCounter: number = 0
     private players: Array<string> = []
+    private readyPlayers: number = 0
     private gameParameters: { [name: string]: string | number }
 
     constructor(name_ : string, playerID_: string, gameParameters_: {[name: string]: string | number}) {
@@ -39,6 +40,11 @@ class Room {
 
     public getInGame() {
         return this.inGame
+    }
+
+    public isPlayerReady(status: boolean) {
+        if (status) this.readyPlayers++
+        else this.readyPlayers--
     }
 
 }

@@ -37,7 +37,7 @@ const ioServer = (httpServer: any, corsConfig: object) => {
         socket.on('connect', () => {
             console.log(`Socket: ${socket.id}}`)
         })
-        
+
         socket.on('create-room-status', (name: string, gameParameters: { [key: string]: string | number }) => {
             const isExisting = listOfRooms.find(r => r.getName() === name ? true : false)
 
@@ -70,6 +70,11 @@ const ioServer = (httpServer: any, corsConfig: object) => {
 
             socket.request.session.user.room = name
             socket.join(name)
+        })
+
+        socket.on('change-status', (name: string, status: boolean) => {
+            const room = listOfRooms.find(r => r.getName() === name)
+            room?.isPlayerReady(status)
         })
 
         // socket.on('leave-room', (name: string) => {
@@ -238,8 +243,6 @@ const ioServer = (httpServer: any, corsConfig: object) => {
                 room?.removePlayer(socket)
                 socket.request.session.user.room = ''
                 socket.leave(socketRoom)
-
-                console.log(room?.getNumberOfPlayers())
 
                 if (room?.getNumberOfPlayers() === 0) listOfRooms = listOfRooms.filter(r => r.getName() !== socketRoom)
             }
